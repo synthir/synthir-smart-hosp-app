@@ -1,14 +1,7 @@
-import {
-	BrowserRouter as Router,
-	Route,
-	Routes,
-	useNavigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import clientContext from "../context/clientContext";
 import ChoosePatient from "./ChoosePatient";
 import Launch from "./Launch";
-import Launch1 from "./Launch1";
-//import Patient from "./Patient";
 import SyntHIRCdss from "./SyntHIRCdss";
 import NotFound from "./NotFound";
 import Client from "fhirclient/lib/Client";
@@ -48,7 +41,7 @@ const App: React.FC = () => {
 						console.log(clientSyntHIR);
 						localStorage.setItem(
 							"synthirAccessToken",
-							JSON.stringify(clientSyntHIR.state.tokenResponse.access_token)
+							JSON.stringify(clientSyntHIR.state.tokenResponse?.access_token)
 						);
 						localStorage.removeItem("synthirClick");
 					};

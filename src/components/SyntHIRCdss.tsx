@@ -3,23 +3,31 @@ import { R4 } from "@ahryman40k/ts-fhir-types";
 import { Link, useParams } from "react-router-dom";
 import clientContext from "../context/clientContext";
 import Launch1 from "./Launch1";
+// import Modal from "react-bootstrap/Modal";
+import {
+	ICondition,
+	IEncounter,
+	IMedicationRequest,
+} from "@ahryman40k/ts-fhir-types/lib/R4";
 
 const Patient: React.FC = () => {
 	const [patient, setPatient] = useState<R4.IPatient | undefined>();
 	const [encounter, setEncounter] = useState<R4.IBundle | undefined>();
-	const [condition, setCondition] = useState<R4.ICondition | undefined>();
+	const [condition, setCondition] = useState<R4.IBundle | undefined>();
 	const [medicationRequest, setMedicationRequest] = useState<
 		R4.IBundle | undefined
 	>();
 	const [medication, setMedication] = useState<R4.IMedication | undefined>();
 	const [encounterRadio, setEncounterRadio] = useState("");
-	const [conditionRadio, setConditionRadio] = useState();
-	const [medicationRequestRadio, setMedicationRequestRadio] = useState();
-	const [medicationRadio, setMedicationRadio] = useState();
+	const [conditionRadio, setConditionRadio] = useState("");
+	const [medicationRequestRadio, setMedicationRequestRadio] = useState("");
+	const [medicationRadio, setMedicationRadio] = useState("");
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | undefined>(undefined);
 	const [triggerSyntHIR, setTriggerSyntHIR] = useState<boolean>(false);
-	const [modelPredictionParams, setModelPredictionParams] = useState({
+	const [modelPredictionParams, setModelPredictionParams] = useState<{
+		[key: string]: string | undefined;
+	}>({
 		patientGender: "",
 		patientAgeGroup: "",
 		patientPostalCode: "",
@@ -29,10 +37,14 @@ const Patient: React.FC = () => {
 		medicationATCCode: "",
 		medicationRequestCategoryCode: "",
 	});
+
 	const [prediction, setPrediction] = useState("");
+	const [showPrediction, setShowPrediction] = useState(false);
+	const handleClosePrediction = () => setShowPrediction(false);
+	const handleShowPrediction = () => setShowPrediction(true);
 	const { id } = useParams();
 	const synthirAccessToken = JSON.parse(
-		localStorage.getItem("synthirAccessToken")
+		localStorage.getItem("synthirAccessToken") || "{}"
 	);
 	const [syntHIRDischargeLocation, setSyntHIRDischargeLocation] = useState("1");
 	const [syntHIRPatientAgeGroup, setSyntHIRPatientAgeGroup] = useState("2");
@@ -50,8 +62,7 @@ const Patient: React.FC = () => {
 					.request({
 						url: `/Patient/${id}`,
 						headers: {
-							"dips-subscription-key": import.meta.env
-								.VITE_DIPS_SUBSCRIPTION_KEY,
+							"dips-subscription-key": "edffd088cc944c8fb50ffd26894aa444",
 						},
 					})
 					.then((patient) => {
@@ -61,7 +72,7 @@ const Patient: React.FC = () => {
 					.catch((error) => {
 						setLoading(false);
 						setError(error);
-						console.error;
+						// console.error;
 					});
 			}
 
@@ -76,18 +87,17 @@ const Patient: React.FC = () => {
 					.request({
 						url: `/Encounter?patient=${patient?.id}`,
 						headers: {
-							"dips-subscription-key": import.meta.env
-								.VITE_DIPS_SUBSCRIPTION_KEY,
+							"dips-subscription-key": "edffd088cc944c8fb50ffd26894aa444",
 						},
 					})
 					.then((encounter) => {
 						setLoading(false);
-						setEncounter(encounter?.entry);
+						setEncounter(encounter);
 					})
 					.catch((error) => {
 						setLoading(false);
 						setError(error);
-						console.error;
+						//console.error;
 					});
 			}
 			fetchEncounter();
@@ -106,12 +116,12 @@ const Patient: React.FC = () => {
 						return response.json();
 					})
 					.then((medicationRequest) => {
-						setMedicationRequest(medicationRequest.entry);
+						setMedicationRequest(medicationRequest);
 					})
 					.catch((error) => {
 						setLoading(false);
 						setError(error);
-						console.error;
+						//console.error;
 					});
 			}
 			fetchMedicationRequest();
@@ -119,7 +129,7 @@ const Patient: React.FC = () => {
 	}, []);
 
 	const handleMedicationRequestEvent = (
-		medicationRequestResourecId: String
+		medicationRequestResourecId: string | undefined
 	) => {
 		if (synthirAccessToken != null) {
 			async function fetchMedication() {
@@ -138,38 +148,38 @@ const Patient: React.FC = () => {
 					.catch((error) => {
 						setLoading(false);
 						setError(error);
-						console.error;
+						//console.error;
 					});
 			}
 			fetchMedication();
 		}
 	};
 
-	const handleEncounterEvent = (encounterResourceId: String) => {
+	const handleEncounterEvent = (encounterResourceId: string | undefined) => {
 		console.log(encounterResourceId);
 		async function fetchCondition() {
 			await client
 				.request({
 					url: `/Condition?patient=${patient?.id}&encounter=${encounterResourceId}`,
 					headers: {
-						"dips-subscription-key": import.meta.env.VITE_DIPS_SUBSCRIPTION_KEY,
+						"dips-subscription-key": "edffd088cc944c8fb50ffd26894aa444",
 					},
 				})
 				.then((condition) => {
 					setLoading(false);
-					setCondition(condition?.entry);
+					setCondition(condition);
 				})
 				.catch((error) => {
 					setLoading(false);
 					setError(error);
-					console.error;
+					//console.error;
 				});
 		}
 		fetchCondition();
 	};
 	const onChangePatientPrediction = (
 		patientGender: string,
-		patientPostalCode: string
+		patientPostalCode: string | undefined
 	) => {
 		//Check patient gender; male=1, female=2
 		const gender = patientGender === "male" ? "1" : "2";
@@ -180,39 +190,50 @@ const Patient: React.FC = () => {
 		});
 	};
 
-	const onChangeEncounterPrediction = (event) => {
+	const onChangeEncounterPrediction = (
+		event: React.ChangeEvent<HTMLInputElement>
+	) => {
 		setEncounterRadio(event.target.value);
 		setModelPredictionParams({
 			...modelPredictionParams,
-			encounterStatus: event.target.getAttribute("data-resourceparam"),
+			encounterStatus: event.target.getAttribute("data-resourceparam") || "",
 		});
 	};
-	const onChangeConditionPrediction = (event) => {
+	const onChangeConditionPrediction = (
+		event: React.ChangeEvent<HTMLInputElement>
+	) => {
 		setConditionRadio(event.target.value);
 		setModelPredictionParams({
 			...modelPredictionParams,
-			conditionDiagnosisCode: event.target.getAttribute("data-resourceparam"),
+			conditionDiagnosisCode:
+				event.target.getAttribute("data-resourceparam") || "",
 		});
 	};
-	const onChangeMedicationRequestPrediction = (event) => {
+	const onChangeMedicationRequestPrediction = (
+		event: React.ChangeEvent<HTMLInputElement>
+	) => {
 		event.stopPropagation();
 		setMedicationRequestRadio(event.target.value);
 		setModelPredictionParams({
 			...modelPredictionParams,
 			medicationRequestCategoryCode:
-				event.target.getAttribute("data-resourceparam"),
+				event.target.getAttribute("data-resourceparam") || "",
 		});
 	};
-	const onChangeMedicationPrediction = (event) => {
+	const onChangeMedicationPrediction = (
+		event: React.ChangeEvent<HTMLInputElement>
+	) => {
 		event.stopPropagation();
 		setMedicationRadio(event.target.value);
 		setModelPredictionParams({
 			...modelPredictionParams,
-			medicationATCCode: event.target.getAttribute("data-resourceparam"),
+			medicationATCCode: event.target.getAttribute("data-resourceparam") || "",
 		});
 	};
 
-	const handleChangeSyntHIRDischargeLocation = (event) => {
+	const handleChangeSyntHIRDischargeLocation = (
+		event: React.ChangeEvent<HTMLSelectElement>
+	) => {
 		setSyntHIRDischargeLocation(event.target.value);
 		setModelPredictionParams({
 			...modelPredictionParams,
@@ -220,7 +241,9 @@ const Patient: React.FC = () => {
 		});
 	};
 
-	const handleChangeSyntHIRPatientAgeGroup = (event) => {
+	const handleChangeSyntHIRPatientAgeGroup = (
+		event: React.ChangeEvent<HTMLSelectElement>
+	) => {
 		setSyntHIRPatientAgeGroup(event.target.value);
 		setModelPredictionParams({
 			...modelPredictionParams,
@@ -229,14 +252,14 @@ const Patient: React.FC = () => {
 	};
 
 	const handleSynthirClick = () => {
-		localStorage.setItem("synthirClick", true);
+		localStorage.setItem("synthirClick", "true");
 		setTriggerSyntHIR(true);
 	};
 
 	const fetchPrediction = () => {
 		console.log(modelPredictionParams);
 		fetch(
-			"http://127.0.0.1:19890/predict?Sex=" +
+			"https://predictmodelapi.azurewebsites.net/predict?Sex=" +
 				modelPredictionParams.patientGender +
 				"&Age_Group= " +
 				modelPredictionParams.patientAgeGroup +
@@ -260,6 +283,7 @@ const Patient: React.FC = () => {
 			.then((data) => {
 				console.log(data);
 				setPrediction(data.prediction);
+				handleShowPrediction();
 			});
 	};
 
@@ -287,6 +311,12 @@ const Patient: React.FC = () => {
 	if (patient && encounter) {
 		return (
 			<>
+				<div className="align-right padding-right">
+					<button className="dipsPrimaryButton" onClick={handleSynthirClick}>
+						Populate data from SyntHIR
+					</button>
+					{triggerSyntHIR && <Launch1 />}
+				</div>
 				<div className="container">
 					<div className="wrapper">
 						<div
@@ -309,61 +339,65 @@ const Patient: React.FC = () => {
 								</p>
 							</div>
 						</div>
-						{encounter.map((encounterEntry) => {
+						{encounter?.entry?.map((encounterEntry) => {
+							const encounterEntryResource =
+								encounterEntry.resource as IEncounter;
 							return (
 								<div
-									key={encounterEntry.resource.id}
+									key={encounterEntry?.resource?.id}
 									className="blue-info-card"
 									onClick={() => {
-										handleEncounterEvent(encounterEntry.resource.id);
+										handleEncounterEvent(encounterEntryResource.id);
 									}}
 								>
 									<div className="text-wrapper">
 										<i className="document-icon"></i>
 										<input
 											type="radio"
-											value={encounterEntry.resource.id}
+											value={encounterEntryResource.id}
 											name="encounter"
-											data-resourceparam={encounterEntry.resource.status}
+											data-resourceparam={encounterEntryResource.status}
 											onChange={onChangeEncounterPrediction}
 											onClick={(event) => event.stopPropagation()}
-											checked={encounterRadio === encounterEntry.resource.id}
+											checked={encounterRadio === encounterEntry?.resource?.id}
 										/>
 										<p className="card-name">Hospitalization Details</p>
-										<p> Status : {encounterEntry.resource.status}</p>
+										<p> Status : {encounterEntryResource.status}</p>
 										<p>
 											{" "}
-											Start date : {encounterEntry.resource.period.start} and
-											end date : {encounterEntry.resource.period.end}
+											Start date : {encounterEntryResource?.period?.start} and
+											end date : {encounterEntryResource?.period?.end}
 										</p>
 									</div>
 								</div>
 							);
 						})}
 						{condition &&
-							condition?.map((conditionEntry) => {
+							condition?.entry?.map((conditionEntry) => {
+								const conditionEntryResource =
+									conditionEntry.resource as ICondition;
 								return (
 									<div
-										key={conditionEntry.resource.id}
+										key={conditionEntryResource.id}
 										className="blue-info-card"
 									>
 										<div className="text-wrapper">
 											<i className="document-icon"></i>
 											<input
 												type="radio"
-												value={conditionEntry.resource.id}
+												value={conditionEntryResource.id}
 												name="condition"
 												data-resourceparam={
-													conditionEntry.resource?.code?.coding![0].code
+													conditionEntryResource.code?.coding![0].code
 												}
 												onChange={onChangeConditionPrediction}
 												onClick={(event) => event.stopPropagation()}
-												checked={conditionRadio === conditionEntry.resource.id}
+												checked={conditionRadio === conditionEntryResource.id}
 											/>
 											<p className="card-name">Condition</p>
 											<p>
 												Main Diagnosis code {" : "}{" "}
-												{conditionEntry.resource?.code?.coding![0].code}
+												{conditionEntryResource.code?.coding![0].code}
 											</p>
 										</div>
 									</div>
@@ -372,14 +406,16 @@ const Patient: React.FC = () => {
 					</div>
 
 					<div className="wrapper">
-						{medicationRequest?.map((medicationRequestEntry) => {
+						{medicationRequest?.entry?.map((medicationRequestEntry) => {
+							const medicationRequestEntryResource =
+								medicationRequestEntry.resource as IMedicationRequest;
 							return (
 								<div
-									key={medicationRequestEntry.resource.id}
+									key={medicationRequestEntryResource.id}
 									className="blue-info-card"
 									onClick={() => {
 										handleMedicationRequestEvent(
-											medicationRequestEntry.resource.medicationReference
+											medicationRequestEntryResource?.medicationReference
 												?.identifier?.value
 											//medicationRequestEntry.resource.note[1].text
 										);
@@ -389,23 +425,24 @@ const Patient: React.FC = () => {
 										<i className="document-icon"></i>
 										<input
 											type="radio"
-											value={medicationRequestEntry.resource.id}
+											value={medicationRequestEntryResource.id}
 											name="medicationRequest"
 											data-resourceparam={
-												medicationRequestEntry.resource.note[1].text
+												medicationRequestEntryResource?.note?.[1].text
 											}
 											onChange={onChangeMedicationRequestPrediction}
 											onClick={(event) => event.stopPropagation()}
 											checked={
 												medicationRequestRadio ===
-												medicationRequestEntry.resource.id
+												medicationRequestEntryResource.id
 											}
 										/>
 										<p className="card-name">Prescriptions</p>
 										<p>
 											Prescription category {" : "}{" "}
-											{medicationRequestEntry.resource.note[0].text}
-											with code : {medicationRequestEntry.resource.note[1].text}
+											{medicationRequestEntryResource?.note?.[0].text}
+											with code :{" "}
+											{medicationRequestEntryResource?.note?.[1].text}
 										</p>
 									</div>
 								</div>
@@ -460,18 +497,21 @@ const Patient: React.FC = () => {
 				</div>
 				<div className="button-wrapper">
 					<div>
-						<button className="dipsPrimaryButton" onClick={handleSynthirClick}>
-							Populate data from SyntHIR
-						</button>
-						{triggerSyntHIR && <Launch1 />}
-					</div>
-					<div>
 						<button className="dipsPrimaryButton" onClick={fetchPrediction}>
 							Predict Risk
 						</button>
-						{<p> Risk of Hospitalization : {prediction}</p>}
 					</div>
 				</div>
+				{/* <Modal
+					show={showPrediction}
+					onHide={handleClosePrediction}
+					backdrop="static"
+				>
+					<Modal.Header closeButton></Modal.Header>
+					<Modal.Body>
+						The predicted risk of Hospitalization is: {prediction}
+					</Modal.Body>
+				</Modal> */}
 			</>
 		);
 	}
