@@ -59,4 +59,4 @@ jobs:
           app-name: 'SynthirSmartAppHospPrediction'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8953C472DD874083B73905D65DB638C6 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0DF7A00C8CB241EB8B5F074D48494A89 }}
