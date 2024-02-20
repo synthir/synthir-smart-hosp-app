@@ -6,7 +6,7 @@ const ChoosePatient: React.FC<{ clientLoading: boolean }> = ({
 	clientLoading,
 }) => {
 	const [patientId, setPatientId] = useState<string>("");
-	const { client, clientSyntHIR } = useContext(clientContext);
+	const { client } = useContext(clientContext);
 	const navigate = useNavigate();
 
 	const renderPatient = (id: string) => {
@@ -17,7 +17,7 @@ const ChoosePatient: React.FC<{ clientLoading: boolean }> = ({
 		if (client?.patient?.id) {
 			navigate(`/patient/${client.patient.id}`);
 		}
-	}, [client]);
+	}, [client, navigate]);
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {

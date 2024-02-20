@@ -23,7 +23,7 @@ const Patient: React.FC = () => {
 	const [medicationRequestRadio, setMedicationRequestRadio] = useState("");
 	const [medicationRadio, setMedicationRadio] = useState("");
 	const [loading, setLoading] = useState<boolean>(false);
-	const [error, setError] = useState<string | undefined>(undefined);
+	//const [error, setError] = useState<string | undefined>(undefined);
 	const [triggerSyntHIR, setTriggerSyntHIR] = useState<boolean>(false);
 	const [modelPredictionParams, setModelPredictionParams] = useState<{
 		[key: string]: string | undefined;
@@ -38,10 +38,10 @@ const Patient: React.FC = () => {
 		medicationRequestCategoryCode: "",
 	});
 
-	const [prediction, setPrediction] = useState("");
-	const [showPrediction, setShowPrediction] = useState(false);
-	const handleClosePrediction = () => setShowPrediction(false);
-	const handleShowPrediction = () => setShowPrediction(true);
+	//const [prediction, setPrediction] = useState("");
+	// const [showPrediction, setShowPrediction] = useState(false);
+	// const handleClosePrediction = () => setShowPrediction(false);
+	// const handleShowPrediction = () => setShowPrediction(true);
 	const { id } = useParams();
 	const synthirAccessToken = JSON.parse(
 		localStorage.getItem("synthirAccessToken") || "{}"
@@ -71,13 +71,14 @@ const Patient: React.FC = () => {
 					})
 					.catch((error) => {
 						setLoading(false);
-						setError(error);
+						//setError(error);
 						// console.error;
 					});
 			}
 
 			fetchPatient();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [client]);
 
 	useEffect(() => {
@@ -96,12 +97,13 @@ const Patient: React.FC = () => {
 					})
 					.catch((error) => {
 						setLoading(false);
-						setError(error);
+						//setError(error);
 						//console.error;
 					});
 			}
 			fetchEncounter();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [patient]);
 
 	useEffect(() => {
@@ -120,12 +122,13 @@ const Patient: React.FC = () => {
 					})
 					.catch((error) => {
 						setLoading(false);
-						setError(error);
+						//setError(error);
 						//console.error;
 					});
 			}
 			fetchMedicationRequest();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	const handleMedicationRequestEvent = (
@@ -147,7 +150,7 @@ const Patient: React.FC = () => {
 					})
 					.catch((error) => {
 						setLoading(false);
-						setError(error);
+						//setError(error);
 						//console.error;
 					});
 			}
@@ -171,7 +174,7 @@ const Patient: React.FC = () => {
 				})
 				.catch((error) => {
 					setLoading(false);
-					setError(error);
+					//setError(error);
 					//console.error;
 				});
 		}
@@ -282,8 +285,8 @@ const Patient: React.FC = () => {
 			})
 			.then((data) => {
 				console.log(data);
-				setPrediction(data.prediction);
-				handleShowPrediction();
+				//setPrediction(data.prediction);
+				//handleShowPrediction();
 			});
 	};
 
