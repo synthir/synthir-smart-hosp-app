@@ -3,7 +3,7 @@ import { R4 } from "@ahryman40k/ts-fhir-types";
 import { Link, useParams } from "react-router-dom";
 import clientContext from "../context/clientContext";
 import Launch1 from "./Launch1";
-// import Modal from "react-bootstrap/Modal";
+import Modal from "react-bootstrap/Modal";
 import {
 	ICondition,
 	IEncounter,
@@ -38,10 +38,10 @@ const Patient: React.FC = () => {
 		medicationRequestCategoryCode: "",
 	});
 
-	//const [prediction, setPrediction] = useState("");
-	// const [showPrediction, setShowPrediction] = useState(false);
-	// const handleClosePrediction = () => setShowPrediction(false);
-	// const handleShowPrediction = () => setShowPrediction(true);
+	const [prediction, setPrediction] = useState("");
+	const [showPrediction, setShowPrediction] = useState(false);
+	const handleClosePrediction = () => setShowPrediction(false);
+	const handleShowPrediction = () => setShowPrediction(true);
 	const { id } = useParams();
 	const synthirAccessToken = JSON.parse(
 		localStorage.getItem("synthirAccessToken") || "{}"
@@ -53,6 +53,8 @@ const Patient: React.FC = () => {
 
 	//patient ID Synthir: 34940 and patient resource ID : 9dbcfce2-2c3a-476a-9b39-eead46d3c725
 	//patient ID OpenDIPS: cdp2010051
+	const dipsSubscriptionKey = process.env.REACT_APP_DIPS_SUBSCRIPTION_KEY || "";
+	console.log(dipsSubscriptionKey);
 
 	useEffect(() => {
 		if (client) {
@@ -62,7 +64,7 @@ const Patient: React.FC = () => {
 					.request({
 						url: `/Patient/${id}`,
 						headers: {
-							"dips-subscription-key": "edffd088cc944c8fb50ffd26894aa444",
+							"dips-subscription-key": dipsSubscriptionKey,
 						},
 					})
 					.then((patient) => {
@@ -88,7 +90,7 @@ const Patient: React.FC = () => {
 					.request({
 						url: `/Encounter?patient=${patient?.id}`,
 						headers: {
-							"dips-subscription-key": "edffd088cc944c8fb50ffd26894aa444",
+							"dips-subscription-key": dipsSubscriptionKey,
 						},
 					})
 					.then((encounter) => {
@@ -285,8 +287,8 @@ const Patient: React.FC = () => {
 			})
 			.then((data) => {
 				console.log(data);
-				//setPrediction(data.prediction);
-				//handleShowPrediction();
+				setPrediction(data.prediction);
+				handleShowPrediction();
 			});
 	};
 
@@ -505,7 +507,8 @@ const Patient: React.FC = () => {
 						</button>
 					</div>
 				</div>
-				{/* <Modal
+
+				<Modal
 					show={showPrediction}
 					onHide={handleClosePrediction}
 					backdrop="static"
@@ -514,7 +517,7 @@ const Patient: React.FC = () => {
 					<Modal.Body>
 						The predicted risk of Hospitalization is: {prediction}
 					</Modal.Body>
-				</Modal> */}
+				</Modal>
 			</>
 		);
 	}
