@@ -2,11 +2,15 @@ import { KeyboardEvent, useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import clientContext from "../context/clientContext";
 
-const ChoosePatient: React.FC<{ clientLoading: boolean }> = ({
-	clientLoading,
-}) => {
+const ChoosePatient: React.FC<{
+	clientLoading: boolean;
+	isSyntHIRClicked: Object;
+}> = ({ clientLoading, isSyntHIRClicked }) => {
 	const [patientId, setPatientId] = useState<string>("");
-	const { client } = useContext(clientContext);
+	const { client, clientSyntHIR } = useContext(clientContext);
+	const currentWorkflowClient = isSyntHIRClicked.synthirWorkflow
+		? clientSyntHIR
+		: client;
 	const navigate = useNavigate();
 
 	const renderPatient = (id: string) => {
@@ -14,10 +18,10 @@ const ChoosePatient: React.FC<{ clientLoading: boolean }> = ({
 	};
 
 	useEffect(() => {
-		if (client?.patient?.id) {
-			navigate(`/patient/${client.patient.id}`);
+		if (currentWorkflowClient?.patient?.id) {
+			navigate(`/patient/${currentWorkflowClient.patient.id}`);
 		}
-	}, [client, navigate]);
+	}, [currentWorkflowClient, navigate]);
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
@@ -25,7 +29,7 @@ const ChoosePatient: React.FC<{ clientLoading: boolean }> = ({
 		}
 	};
 
-	if (client) {
+	if (currentWorkflowClient) {
 		return (
 			<div className="choosePatientWrapper">
 				<div className="inputDialog">
@@ -50,7 +54,7 @@ const ChoosePatient: React.FC<{ clientLoading: boolean }> = ({
 				</div>
 			</div>
 		);
-	} else if (!client && !clientLoading) {
+	} else if (!currentWorkflowClient && !clientLoading) {
 		return (
 			<div className="orange-info-card">
 				<div className="text-wrapper">

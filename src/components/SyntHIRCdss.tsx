@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { R4 } from "@ahryman40k/ts-fhir-types";
 import { Link, useParams } from "react-router-dom";
 import clientContext from "../context/clientContext";
-import Launch1 from "./Launch1";
+import LaunchSyntHIR from "./LaunchSyntHIR";
 import Modal from "react-bootstrap/Modal";
 import {
 	ICondition,
@@ -10,7 +10,9 @@ import {
 	IMedicationRequest,
 } from "@ahryman40k/ts-fhir-types/lib/R4";
 
-const Patient: React.FC = () => {
+const Patient: React.FC<{
+	isSyntHIRClicked: Object;
+}> = ({ isSyntHIRClicked }) => {
 	const [patient, setPatient] = useState<R4.IPatient | undefined>();
 	const [encounter, setEncounter] = useState<R4.IBundle | undefined>();
 	const [condition, setCondition] = useState<R4.IBundle | undefined>();
@@ -44,44 +46,65 @@ const Patient: React.FC = () => {
 	const handleShowPrediction = () => setShowPrediction(true);
 	const { id } = useParams();
 	const synthirAccessToken = JSON.parse(
-		localStorage.getItem("synthirAccessToken") || "{}"
+		sessionStorage.getItem("synthirAccessToken") || "{}"
 	);
 	const [syntHIRDischargeLocation, setSyntHIRDischargeLocation] = useState("1");
 	const [syntHIRPatientAgeGroup, setSyntHIRPatientAgeGroup] = useState("2");
-
 	const { client } = useContext(clientContext);
 
 	//patient ID Synthir: 34940 and patient resource ID : 9dbcfce2-2c3a-476a-9b39-eead46d3c725
 	//patient ID OpenDIPS: cdp2010051
 	const dipsSubscriptionKey = process.env.REACT_APP_DIPS_SUBSCRIPTION_KEY || "";
-	console.log(dipsSubscriptionKey);
 
 	useEffect(() => {
-		if (client) {
-			setLoading(true);
-			async function fetchPatient() {
-				await client
-					.request({
-						url: `/Patient/${id}`,
-						headers: {
-							"dips-subscription-key": dipsSubscriptionKey,
-						},
+		if (isSyntHIRClicked.synthirWorkflow) {
+			if (synthirAccessToken != null) {
+				async function fetchPatientFromSyntHIR() {
+					const fetchPatientResourceAPIUrl = `https://synthir-test-fhir-server.azurehealthcareapis.com/Patient/${id}`;
+					fetch(fetchPatientResourceAPIUrl, {
+						headers: { Authorization: "Bearer " + synthirAccessToken },
 					})
-					.then((patient) => {
-						setLoading(false);
-						setPatient(patient);
-					})
-					.catch((error) => {
-						setLoading(false);
-						//setError(error);
-						// console.error;
-					});
+						.then((response) => {
+							return response.json();
+						})
+						.then((patientSyntHIR) => {
+							setPatient(patientSyntHIR);
+						})
+						.catch((error) => {
+							setLoading(false);
+							//setError(error);
+							//console.error;
+						});
+				}
+				fetchPatientFromSyntHIR();
 			}
+		} else {
+			if (client) {
+				setLoading(true);
+				async function fetchPatient() {
+					await client
+						.request({
+							url: `/Patient/${id}`,
+							headers: {
+								"dips-subscription-key": dipsSubscriptionKey,
+							},
+						})
+						.then((patient) => {
+							setLoading(false);
+							setPatient(patient);
+						})
+						.catch((error) => {
+							setLoading(false);
+							//setError(error);
+							// console.error;
+						});
+				}
 
-			fetchPatient();
+				fetchPatient();
+			}
+			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [client]);
+	}, [client, isSyntHIRClicked.synthirWorkflow]);
 
 	useEffect(() => {
 		if (patient?.id) {
@@ -257,7 +280,15 @@ const Patient: React.FC = () => {
 	};
 
 	const handleSynthirClick = () => {
-		localStorage.setItem("synthirClick", "true");
+		// sessionStorage.setItem("synthirClick", "true");
+		const sessionStorageObj = {
+			synthirClick: true,
+			synthirWorkflow: true,
+		};
+		sessionStorage.setItem(
+			"synthirClickKey",
+			JSON.stringify(sessionStorageObj)
+		);
 		setTriggerSyntHIR(true);
 	};
 
@@ -320,7 +351,7 @@ const Patient: React.FC = () => {
 					<button className="dipsPrimaryButton" onClick={handleSynthirClick}>
 						Populate data from SyntHIR
 					</button>
-					{triggerSyntHIR && <Launch1 />}
+					{triggerSyntHIR && <LaunchSyntHIR />}
 				</div>
 				<div className="container">
 					<div className="wrapper">
