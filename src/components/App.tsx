@@ -51,7 +51,7 @@ const App: React.FC = () => {
 							"synthirAccessToken",
 							JSON.stringify(clientSyntHIR.state.tokenResponse?.access_token)
 						);
-						sessionStorage.removeItem("synthirClick");
+						sessionStorage.removeItem("synthirClickKey");
 					};
 					updateClient().then(() => {
 						setLoading(false);
