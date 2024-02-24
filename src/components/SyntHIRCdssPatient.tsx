@@ -17,7 +17,6 @@ const Patient: React.FC = () => {
 	const [medicationRequest, setMedicationRequest] = useState<
 		R4.IBundle | undefined
 	>();
-	console.log({ medicationRequest });
 	const [medication, setMedication] = useState<R4.IMedication | undefined>();
 	const [encounterRadio, setEncounterRadio] = useState("");
 	const [conditionRadio, setConditionRadio] = useState("");
@@ -124,7 +123,7 @@ const Patient: React.FC = () => {
 			fetchMedicationRequest();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [patient]);
 
 	const handleMedicationRequestEvent = (
 		medicationRequestResourecId: string | undefined
