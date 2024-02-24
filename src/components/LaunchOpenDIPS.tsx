@@ -15,7 +15,11 @@ const LaunchOpenDIPS: React.FC = () => {
 		launch = "";
 	}
 
-	if (!sessionStorage.getItem("synthirClick")) {
+	const isSyntHIRClicked =
+		sessionStorage.getItem("synthirClickKey") != null &&
+		JSON.parse(sessionStorage.getItem("synthirClickKey") || "");
+
+	if (!isSyntHIRClicked.synthirClick) {
 		FHIR.oauth2.authorize({
 			iss: "https://api.dips.no/fhir",
 			redirectUri: "/launch",
