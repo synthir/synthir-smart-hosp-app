@@ -4,6 +4,7 @@ import ChoosePatient from "./ChoosePatient";
 import LaunchOpenDIPS from "./LaunchOpenDIPS";
 import LaunchSyntHIR from "./LaunchSyntHIR";
 import SyntHIRCdss from "./SyntHIRCdss";
+import SyntHIRCdssPatient from "./SyntHIRCdssPatient";
 import NotFound from "./NotFound";
 import Client from "fhirclient/lib/Client";
 import { useEffect, useState } from "react";
@@ -88,9 +89,10 @@ const App: React.FC = () => {
 							}
 						/>
 						<Route path="/app" element={<LaunchOpenDIPS />} />
+						<Route path="/patient/:id" element={<SyntHIRCdss />} />
 						<Route
-							path="/patient/:id"
-							element={<SyntHIRCdss isSyntHIRClicked={isSyntHIRClicked} />}
+							path="/synthirPatient/:id"
+							element={<SyntHIRCdssPatient />}
 						/>
 						<Route path="*" element={<NotFound />} />
 					</Routes>

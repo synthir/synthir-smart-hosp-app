@@ -1,25 +1,29 @@
 import { KeyboardEvent, useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import clientContext from "../context/clientContext";
+import { IsSyntHIRClickedType } from "./types";
 
 const ChoosePatient: React.FC<{
 	clientLoading: boolean;
-	isSyntHIRClicked: Object;
+	isSyntHIRClicked: IsSyntHIRClickedType;
 }> = ({ clientLoading, isSyntHIRClicked }) => {
 	const [patientId, setPatientId] = useState<string>("");
 	const { client, clientSyntHIR } = useContext(clientContext);
-	const currentWorkflowClient = isSyntHIRClicked.synthirWorkflow
-		? clientSyntHIR
-		: client;
+	const isSynthirWorkflow = isSyntHIRClicked.synthirWorkflow;
+	const currentWorkflowClient = isSynthirWorkflow ? clientSyntHIR : client;
 	const navigate = useNavigate();
 
 	const renderPatient = (id: string) => {
-		navigate(`/patient/${id}`);
+		isSynthirWorkflow
+			? navigate(`/synthirPatient/${id}`)
+			: navigate(`/patient/${id}`);
 	};
 
 	useEffect(() => {
 		if (currentWorkflowClient?.patient?.id) {
-			navigate(`/patient/${currentWorkflowClient.patient.id}`);
+			isSynthirWorkflow
+				? navigate(`/synthirPatient/${currentWorkflowClient.patient.id}`)
+				: navigate(`/patient/${currentWorkflowClient.patient.id}`);
 		}
 	}, [currentWorkflowClient, navigate]);
 
@@ -47,7 +51,14 @@ const ChoosePatient: React.FC<{
 						/>
 					</div>
 					<button className="dipsPrimaryButton">
-						<Link className="buttonLink" to={`/patient/${patientId}`}>
+						<Link
+							className="buttonLink"
+							to={
+								isSynthirWorkflow
+									? `/synthirPatient/${patientId}`
+									: `/patient/${patientId}`
+							}
+						>
 							Search
 						</Link>
 					</button>
