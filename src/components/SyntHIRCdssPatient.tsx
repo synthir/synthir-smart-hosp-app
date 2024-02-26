@@ -3,7 +3,8 @@ import { R4 } from "@ahryman40k/ts-fhir-types";
 import { Link, useParams } from "react-router-dom";
 import clientContext from "../context/clientContext";
 import LaunchSyntHIR from "./LaunchSyntHIR";
-import Modal from "react-bootstrap/Modal";
+import { Container, Button, Row, Col, Modal } from "react-bootstrap";
+import SimpleBar from "simplebar-react";
 import {
 	ICondition,
 	IEncounter,
@@ -317,163 +318,238 @@ const Patient: React.FC = () => {
 	if (patient && encounter) {
 		return (
 			<>
-				<div className="container">
-					<div className="wrapper">
-						<div
-							className="blue-info-card"
-							onClick={() => {
-								onChangePatientPrediction(
-									patient?.gender!,
-									patient?.address![0].postalCode
-								);
-							}}
-						>
-							<div className="text-wrapper">
-								<i className="person-icon"></i>
-								<p className="card-name"></p>
-								<p>
-									Patient ID {" : "}
-									{patient?.identifier![0].value} is a {patient?.gender!}{" "}
-									patient born {patient?.birthDate!} in age group. Born in
-									county {" : "} {patient?.address![0].postalCode}
-								</p>
-							</div>
-						</div>
-						{encounter?.entry?.map((encounterEntry) => {
-							const encounterEntryResource =
-								encounterEntry.resource as IEncounter;
-							return (
-								<div
-									key={encounterEntry?.resource?.id}
-									className="blue-info-card"
-									onClick={() => {
-										handleEncounterEvent(encounterEntryResource.id);
-									}}
-								>
-									<div className="text-wrapper">
-										<i className="document-icon"></i>
-										<input
-											type="radio"
-											value={encounterEntryResource.id}
-											name="encounter"
-											data-resourceparam={encounterEntryResource.status}
-											onChange={onChangeEncounterPrediction}
-											onClick={(event) => event.stopPropagation()}
-											checked={encounterRadio === encounterEntry?.resource?.id}
-										/>
-										<p className="card-name">Hospitalization Details</p>
-										<p> Status : {encounterEntryResource.status}</p>
-										<p>
-											{" "}
-											Start date : {encounterEntryResource?.period?.start} and
-											end date : {encounterEntryResource?.period?.end}
-										</p>
-									</div>
-								</div>
+				<div className="align-right padding-right">
+					<Button
+						className="mb-5"
+						size="lg"
+						onClick={handleSynthirClick}
+						variant="primary"
+					>
+						Populate data from SyntHIR
+					</Button>
+					{triggerSyntHIR && <LaunchSyntHIR />}
+				</div>
+				<Container fluid>
+					<div
+						className="patient-details"
+						onClick={() => {
+							onChangePatientPrediction(
+								patient?.gender!,
+								patient?.address![0].postalCode
 							);
-						})}
-						{condition &&
-							condition?.entry?.map((conditionEntry) => {
-								const conditionEntryResource =
-									conditionEntry.resource as ICondition;
-								return (
-									<div
-										key={conditionEntryResource.id}
-										className="blue-info-card"
-									>
-										<div className="text-wrapper">
-											<i className="document-icon"></i>
-											<input
-												type="radio"
-												value={conditionEntryResource.id}
-												name="condition"
-												data-resourceparam={
-													conditionEntryResource.code?.coding![0].code
-												}
-												onChange={onChangeConditionPrediction}
-												onClick={(event) => event.stopPropagation()}
-												checked={conditionRadio === conditionEntryResource.id}
-											/>
-											<p className="card-name">Condition</p>
-											<p>
-												Main Diagnosis code {" : "}{" "}
-												{conditionEntryResource.code?.coding![0].code}
-											</p>
-										</div>
-									</div>
-								);
-							})}
+						}}
+					>
+						<p>
+							<i className="person-icon"></i>
+							Patient ID {" : "}
+							{patient?.identifier![0].value} is a {patient?.gender!} patient
+						</p>
+						<p>
+							born {patient?.birthDate!} in age group. Born in county {" : "}{" "}
+							{patient?.address![0].postalCode}
+						</p>
 					</div>
-
-					<div className="wrapper">
-						{medicationRequest?.entry?.map((medicationRequestEntry) => {
-							const medicationRequestEntryResource =
-								medicationRequestEntry.resource as IMedicationRequest;
-							return (
-								<div
-									key={medicationRequestEntryResource.id}
-									className="blue-info-card"
-									onClick={() => {
-										handleMedicationRequestEvent(
-											medicationRequestEntryResource?.medicationReference
-												?.identifier?.value
-											//medicationRequestEntry.resource.note[1].text
+					{encounter && (
+						<div className="width100">
+							<h2>Hospitalization Details</h2>
+							<SimpleBar>
+								<Row className="pb-5  flex-nowrap">
+									{encounter?.entry?.map((encounterEntry) => {
+										const encounterEntryResource =
+											encounterEntry.resource as IEncounter;
+										return (
+											<Col className="me-2">
+												<div
+													key={encounterEntry?.resource?.id}
+													className="blue-info-card"
+													onClick={() => {
+														handleEncounterEvent(encounterEntryResource.id);
+													}}
+												>
+													<div className="text-wrapper">
+														<input
+															type="radio"
+															value={encounterEntryResource.id}
+															name="encounter"
+															data-resourceparam={encounterEntryResource.status}
+															onChange={onChangeEncounterPrediction}
+															onClick={(event) => event.stopPropagation()}
+															checked={
+																encounterRadio === encounterEntry?.resource?.id
+															}
+														/>
+														<p> Status : {encounterEntryResource.status}</p>
+														<p>
+															{" "}
+															Start date :{" "}
+															{encounterEntryResource?.period?.start} and end
+															date : {encounterEntryResource?.period?.end}
+														</p>
+													</div>
+												</div>
+											</Col>
 										);
-									}}
-								>
-									<div className="text-wrapper">
-										<i className="document-icon"></i>
-										<input
-											type="radio"
-											value={medicationRequestEntryResource.id}
-											name="medicationRequest"
-											data-resourceparam={
-												medicationRequestEntryResource?.note?.[1].text
-											}
-											onChange={onChangeMedicationRequestPrediction}
-											onClick={(event) => event.stopPropagation()}
-											checked={
-												medicationRequestRadio ===
-												medicationRequestEntryResource.id
-											}
-										/>
-										<p className="card-name">Prescriptions</p>
-										<p>
-											Prescription category {" : "}{" "}
-											{medicationRequestEntryResource?.note?.[0].text}
-											with code :{" "}
-											{medicationRequestEntryResource?.note?.[1].text}
-										</p>
-									</div>
+									})}
+								</Row>
+							</SimpleBar>
+						</div>
+					)}
+					{condition && (
+						<div className="width100">
+							<h2 className="mt-4">Condition</h2>
+							<SimpleBar>
+								<Row className="pb-5  flex-nowrap">
+									{condition?.entry?.map((conditionEntry) => {
+										const conditionEntryResource =
+											conditionEntry.resource as ICondition;
+										return (
+											<Col className="me-3">
+												<div
+													key={conditionEntryResource.id}
+													className="blue-info-card"
+												>
+													<div className="text-wrapper">
+														<input
+															type="radio"
+															value={conditionEntryResource.id}
+															name="condition"
+															data-resourceparam={
+																conditionEntryResource.code?.coding![0].code
+															}
+															onChange={onChangeConditionPrediction}
+															onClick={(event) => event.stopPropagation()}
+															checked={
+																conditionRadio === conditionEntryResource.id
+															}
+														/>
+														<p>
+															Main Diagnosis code {" : "}{" "}
+															{conditionEntryResource.code?.coding![0].code}
+														</p>
+													</div>
+												</div>
+											</Col>
+										);
+									})}
+								</Row>
+							</SimpleBar>
+						</div>
+					)}
+
+					{medicationRequest && (
+						<div className="width100">
+							<h2 className="mt-4">Prescriptions</h2>
+							<SimpleBar>
+								<Row className="pb-5 flex-nowrap">
+									{medicationRequest?.entry?.map((medicationRequestEntry) => {
+										const medicationRequestEntryResource =
+											medicationRequestEntry.resource as IMedicationRequest;
+										return (
+											<Col xs={2} className="me-3">
+												<div
+													key={medicationRequestEntryResource.id}
+													className="blue-info-card"
+													onClick={() => {
+														handleMedicationRequestEvent(
+															medicationRequestEntryResource
+																?.medicationReference?.identifier?.value
+															//medicationRequestEntry.resource.note[1].text
+														);
+													}}
+												>
+													<div className="text-wrapper">
+														<input
+															type="radio"
+															value={medicationRequestEntryResource.id}
+															name="medicationRequest"
+															data-resourceparam={
+																medicationRequestEntryResource?.note?.[1].text
+															}
+															onChange={onChangeMedicationRequestPrediction}
+															onClick={(event) => event.stopPropagation()}
+															checked={
+																medicationRequestRadio ===
+																medicationRequestEntryResource.id
+															}
+														/>
+														<p>
+															Prescription category {" : "}{" "}
+															{medicationRequestEntryResource?.note?.[0].text}
+															with code :{" "}
+															{medicationRequestEntryResource?.note?.[1].text}
+														</p>
+													</div>
+												</div>
+											</Col>
+										);
+									})}
+								</Row>
+							</SimpleBar>
+						</div>
+					)}
+
+					{medication && (
+						<div className="width100">
+							<h2 className="mt-4">Medication</h2>
+
+							<div className="blue-info-card">
+								<div className="text-wrapper">
+									<input
+										type="radio"
+										value={medication?.id}
+										name="medication"
+										data-resourceparam={medication?.code?.coding![0].code}
+										onChange={onChangeMedicationPrediction}
+										onClick={(event) => event.stopPropagation()}
+										checked={medicationRadio === medication?.id}
+									/>
+
+									<p>
+										Medication {" : "} {medication?.code?.text} with ICD-10 code
+										as {" : "} {medication?.code?.coding![0].code}
+									</p>
 								</div>
-							);
-						})}
-						<div className="blue-info-card">
-							<div className="text-wrapper">
-								<i className="document-icon"></i>
-								<input
-									type="radio"
-									value={medication?.id}
-									name="medication"
-									data-resourceparam={medication?.code?.coding![0].code}
-									onChange={onChangeMedicationPrediction}
-									onClick={(event) => event.stopPropagation()}
-									checked={medicationRadio === medication?.id}
-								/>
-								<p className="card-name">Medication</p>
-								<p>
-									Medication {" : "} {medication?.code?.text} with ICD-10 code
-									as {" : "} {medication?.code?.coding![0].code}
-								</p>
 							</div>
 						</div>
+					)}
+				</Container>
+				<div className="text-wrapper dropdown-wrapper">
+					<div>
+						<p>SyntHIR Discharge Location Values</p>
+						<select
+							className="mb-3"
+							value={syntHIRDischargeLocation}
+							onChange={handleChangeSyntHIRDischargeLocation}
+						>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+						</select>
+					</div>
+					<div>
+						<p>SyntHIR Patient Age Group</p>
+						<select
+							value={syntHIRPatientAgeGroup}
+							onChange={handleChangeSyntHIRPatientAgeGroup}
+						>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+						</select>
 					</div>
 				</div>
 				<div className="button-wrapper">
 					<div>
-						<button className="dipsPrimaryButton" onClick={fetchPrediction}>
+						<Button
+							className="mb-5"
+							size="lg"
+							onClick={fetchPrediction}
+							variant="primary"
+						>
 							Predict Risk
-						</button>
+						</Button>
 					</div>
 				</div>
 

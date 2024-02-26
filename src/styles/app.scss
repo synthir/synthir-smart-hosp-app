@@ -1,12 +1,29 @@
 @import "variables.scss";
 @import "mixins.scss";
+// Import Bootstrap and its default variables
+@import "~bootstrap/scss/bootstrap.scss";
+
+:root {
+	--primary-color: #1d80a8;
+	--secondary-color: #7dc5ea;
+}
+
+.btn-primary {
+	background-color: var(--primary-color);
+	border-color: var(--primary-color);
+	&:hover {
+		background-color: var(--primary-color);
+		border-color: var(--primary-color);
+	}
+}
 
 .container {
-	display: flex;
+	width: 100%;
+	margin: 0 40px;
 }
 
 .wrapper {
-	align-items: center;
+	// align-items: center;
 	justify-content: center;
 	display: flex;
 	height: 800px;
@@ -41,7 +58,7 @@
 	align-items: center;
 	display: flex;
 	flex-direction: column;
-	margin: 20px;
+	margin: 10px;
 	margin-top: 30px;
 }
 
@@ -52,12 +69,12 @@
 }
 
 .person-icon {
-	height: 40px;
-	width: 40px;
+	height: 20px;
+	width: 20px;
 	background-size: 100% 100%;
 	background-image: url("../assets/man-icon.svg");
-	margin: auto;
-	margin-top: 20px;
+	margin: 20px 5px 0 0;
+	display: inline-block;
 }
 
 .document-icon {
@@ -78,12 +95,16 @@
 .blue-info-card {
 	@include info-card;
 	background-color: $dips-dark-blue;
+	float: left;
 }
 
 .orange-info-card {
 	@include info-card;
 	background-color: $dips-dark-orange;
 	align-items: center;
+}
+.width100 {
+	width: 100%;
 }
 
 @media (max-width: 800px) {

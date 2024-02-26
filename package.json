@@ -24,6 +24,7 @@
 		"react-router-dom": "^6.8.2",
 		"react-scripts": "^5.0.1",
 		"sass": "^1.60.0",
+		"simplebar-react": "^3.2.4",
 		"typescript": "^4.9.5",
 		"web-vitals": "^3.1.1"
 	},

@@ -2,6 +2,7 @@ import { KeyboardEvent, useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import clientContext from "../context/clientContext";
 import { IsSyntHIRClickedType } from "./types";
+import { Button } from "react-bootstrap";
 
 const ChoosePatient: React.FC<{
 	clientLoading: boolean;
@@ -50,18 +51,14 @@ const ChoosePatient: React.FC<{
 							onKeyDown={(e) => handleKeyDown(e)}
 						/>
 					</div>
-					<button className="dipsPrimaryButton">
-						<Link
-							className="buttonLink"
-							to={
-								isSynthirWorkflow
-									? `/synthirPatient/${patientId}`
-									: `/patient/${patientId}`
-							}
-						>
-							Search
-						</Link>
-					</button>
+					<Button
+						className="me-3"
+						size="lg"
+						onClick={() => renderPatient(patientId)}
+						variant="primary"
+					>
+						Search
+					</Button>
 				</div>
 			</div>
 		);
