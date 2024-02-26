@@ -322,14 +322,6 @@ const Patient: React.FC = () => {
 		return (
 			<>
 				<div className="align-right padding-right">
-					<Button
-						className="mb-5"
-						size="lg"
-						onClick={handleSynthirClick}
-						variant="primary"
-					>
-						Populate data from SyntHIR
-					</Button>
 					{triggerSyntHIR && <LaunchSyntHIR />}
 				</div>
 				<Container fluid>
@@ -354,14 +346,14 @@ const Patient: React.FC = () => {
 					</div>
 					{encounter && (
 						<div className="width100">
-							<h2>Hospitalization Details</h2>
+							<h2 className="mt-5">Hospitalization Details</h2>
 							<SimpleBar>
 								<Row className="pb-5  flex-nowrap">
 									{encounter?.entry?.map((encounterEntry) => {
 										const encounterEntryResource =
 											encounterEntry.resource as IEncounter;
 										return (
-											<Col className="me-2">
+											<Col xs={2} className="me-2">
 												<div
 													key={encounterEntry?.resource?.id}
 													className="blue-info-card"
@@ -406,7 +398,7 @@ const Patient: React.FC = () => {
 										const conditionEntryResource =
 											conditionEntry.resource as ICondition;
 										return (
-											<Col className="me-3">
+											<Col xs={2} className="me-3">
 												<div
 													key={conditionEntryResource.id}
 													className="blue-info-card"
@@ -494,55 +486,31 @@ const Patient: React.FC = () => {
 					{medication && (
 						<div className="width100">
 							<h2 className="mt-4">Medication</h2>
+							<Row className="pb-5 flex-nowrap">
+								<Col xs={2} className="me-3">
+									<div className="blue-info-card">
+										<div className="text-wrapper">
+											<input
+												type="radio"
+												value={medication?.id}
+												name="medication"
+												data-resourceparam={medication?.code?.coding![0].code}
+												onChange={onChangeMedicationPrediction}
+												onClick={(event) => event.stopPropagation()}
+												checked={medicationRadio === medication?.id}
+											/>
 
-							<div className="blue-info-card">
-								<div className="text-wrapper">
-									<input
-										type="radio"
-										value={medication?.id}
-										name="medication"
-										data-resourceparam={medication?.code?.coding![0].code}
-										onChange={onChangeMedicationPrediction}
-										onClick={(event) => event.stopPropagation()}
-										checked={medicationRadio === medication?.id}
-									/>
-
-									<p>
-										Medication {" : "} {medication?.code?.text} with ICD-10 code
-										as {" : "} {medication?.code?.coding![0].code}
-									</p>
-								</div>
-							</div>
+											<p>
+												Medication {" : "} {medication?.code?.text} with ICD-10
+												code as {" : "} {medication?.code?.coding![0].code}
+											</p>
+										</div>
+									</div>
+								</Col>
+							</Row>
 						</div>
 					)}
 				</Container>
-				<div className="text-wrapper dropdown-wrapper">
-					<div>
-						<p>SyntHIR Discharge Location Values</p>
-						<select
-							className="mb-3"
-							value={syntHIRDischargeLocation}
-							onChange={handleChangeSyntHIRDischargeLocation}
-						>
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-						</select>
-					</div>
-					<div>
-						<p>SyntHIR Patient Age Group</p>
-						<select
-							value={syntHIRPatientAgeGroup}
-							onChange={handleChangeSyntHIRPatientAgeGroup}
-						>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-							<option value="5">5</option>
-							<option value="6">6</option>
-						</select>
-					</div>
-				</div>
 				<div className="button-wrapper">
 					<div>
 						<Button

@@ -358,7 +358,7 @@ const Patient: React.FC = () => {
 										const encounterEntryResource =
 											encounterEntry.resource as IEncounter;
 										return (
-											<Col className="me-2">
+											<Col xs={2} className="me-2">
 												<div
 													key={encounterEntry?.resource?.id}
 													className="blue-info-card"
@@ -403,7 +403,7 @@ const Patient: React.FC = () => {
 										const conditionEntryResource =
 											conditionEntry.resource as ICondition;
 										return (
-											<Col className="me-3">
+											<Col xs={2} className="me-3">
 												<div
 													key={conditionEntryResource.id}
 													className="blue-info-card"
@@ -491,25 +491,28 @@ const Patient: React.FC = () => {
 					{medication && (
 						<div className="width100">
 							<h2 className="mt-4">Medication</h2>
+							<Row className="pb-5 flex-nowrap">
+								<Col xs={2} className="me-3">
+									<div className="blue-info-card">
+										<div className="text-wrapper">
+											<input
+												type="radio"
+												value={medication?.id}
+												name="medication"
+												data-resourceparam={medication?.code?.coding![0].code}
+												onChange={onChangeMedicationPrediction}
+												onClick={(event) => event.stopPropagation()}
+												checked={medicationRadio === medication?.id}
+											/>
 
-							<div className="blue-info-card">
-								<div className="text-wrapper">
-									<input
-										type="radio"
-										value={medication?.id}
-										name="medication"
-										data-resourceparam={medication?.code?.coding![0].code}
-										onChange={onChangeMedicationPrediction}
-										onClick={(event) => event.stopPropagation()}
-										checked={medicationRadio === medication?.id}
-									/>
-
-									<p>
-										Medication {" : "} {medication?.code?.text} with ICD-10 code
-										as {" : "} {medication?.code?.coding![0].code}
-									</p>
-								</div>
-							</div>
+											<p>
+												Medication {" : "} {medication?.code?.text} with ICD-10
+												code as {" : "} {medication?.code?.coding![0].code}
+											</p>
+										</div>
+									</div>
+								</Col>
+							</Row>
 						</div>
 					)}
 				</Container>
