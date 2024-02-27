@@ -1,7 +1,7 @@
 import FHIR from "fhirclient";
 import { useSearchParams } from "react-router-dom";
 
-const Launch: React.FC = () => {
+const LaunchOpenDIPS: React.FC = () => {
 	const [searchParams] = useSearchParams();
 
 	// Let user specify issuer (iss) in query param
@@ -15,7 +15,11 @@ const Launch: React.FC = () => {
 		launch = "";
 	}
 
-	if (!localStorage.getItem("synthirClick")) {
+	const isSyntHIRClicked =
+		sessionStorage.getItem("synthirClickKey") != null &&
+		JSON.parse(sessionStorage.getItem("synthirClickKey") || "");
+
+	if (!isSyntHIRClicked.synthirClick) {
 		FHIR.oauth2.authorize({
 			iss: "https://api.dips.no/fhir",
 			redirectUri: "/launch",
@@ -28,4 +32,4 @@ const Launch: React.FC = () => {
 	return null;
 };
 
-export default Launch;
+export default LaunchOpenDIPS;

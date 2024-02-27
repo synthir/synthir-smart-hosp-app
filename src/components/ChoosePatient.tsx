@@ -1,23 +1,34 @@
 import { KeyboardEvent, useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import clientContext from "../context/clientContext";
+import { Button } from "react-bootstrap";
 
-const ChoosePatient: React.FC<{ clientLoading: boolean }> = ({
-	clientLoading,
-}) => {
+const ChoosePatient: React.FC<{
+	clientLoading: boolean;
+}> = ({ clientLoading }) => {
 	const [patientId, setPatientId] = useState<string>("");
-	const { client } = useContext(clientContext);
+	const { client, clientSyntHIR } = useContext(clientContext);
+	let isSyntHIRClicked =
+		sessionStorage.getItem("synthirClickKey") != null &&
+		JSON.parse(sessionStorage.getItem("synthirClickKey") || "");
+	const isSynthirWorkflow = isSyntHIRClicked.synthirWorkflow;
+	const currentWorkflowClient = isSynthirWorkflow ? clientSyntHIR : client;
 	const navigate = useNavigate();
 
 	const renderPatient = (id: string) => {
-		navigate(`/patient/${id}`);
+		isSynthirWorkflow
+			? navigate(`/synthirPatient/${id}`)
+			: navigate(`/patient/${id}`);
 	};
 
 	useEffect(() => {
-		if (client?.patient?.id) {
-			navigate(`/patient/${client.patient.id}`);
+		if (currentWorkflowClient?.patient?.id) {
+			isSynthirWorkflow
+				? navigate(`/synthirPatient/${currentWorkflowClient.patient.id}`)
+				: navigate(`/patient/${currentWorkflowClient.patient.id}`);
 		}
-	}, [client, navigate]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currentWorkflowClient, navigate]);
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === "Enter") {
@@ -25,7 +36,7 @@ const ChoosePatient: React.FC<{ clientLoading: boolean }> = ({
 		}
 	};
 
-	if (client) {
+	if (currentWorkflowClient) {
 		return (
 			<div className="choosePatientWrapper">
 				<div className="inputDialog">
@@ -42,15 +53,18 @@ const ChoosePatient: React.FC<{ clientLoading: boolean }> = ({
 							onKeyDown={(e) => handleKeyDown(e)}
 						/>
 					</div>
-					<button className="dipsPrimaryButton">
-						<Link className="buttonLink" to={`/patient/${patientId}`}>
-							Search
-						</Link>
-					</button>
+					<Button
+						className="me-3"
+						size="lg"
+						onClick={() => renderPatient(patientId)}
+						variant="primary"
+					>
+						Search
+					</Button>
 				</div>
 			</div>
 		);
-	} else if (!client && !clientLoading) {
+	} else if (!currentWorkflowClient && !clientLoading) {
 		return (
 			<div className="orange-info-card">
 				<div className="text-wrapper">

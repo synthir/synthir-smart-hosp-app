@@ -2,13 +2,14 @@ import { useContext, useEffect, useState } from "react";
 import { R4 } from "@ahryman40k/ts-fhir-types";
 import { Link, useParams } from "react-router-dom";
 import clientContext from "../context/clientContext";
-import Launch1 from "./Launch1";
-// import Modal from "react-bootstrap/Modal";
+import LaunchSyntHIR from "./LaunchSyntHIR";
 import {
 	ICondition,
 	IEncounter,
 	IMedicationRequest,
 } from "@ahryman40k/ts-fhir-types/lib/R4";
+import { Container, Button, Row, Col, Modal } from "react-bootstrap";
+import SimpleBar from "simplebar-react";
 
 const Patient: React.FC = () => {
 	const [patient, setPatient] = useState<R4.IPatient | undefined>();
@@ -38,21 +39,21 @@ const Patient: React.FC = () => {
 		medicationRequestCategoryCode: "",
 	});
 
-	//const [prediction, setPrediction] = useState("");
-	// const [showPrediction, setShowPrediction] = useState(false);
-	// const handleClosePrediction = () => setShowPrediction(false);
-	// const handleShowPrediction = () => setShowPrediction(true);
+	const [prediction, setPrediction] = useState("");
+	const [showPrediction, setShowPrediction] = useState(false);
+	const handleClosePrediction = () => setShowPrediction(false);
+	const handleShowPrediction = () => setShowPrediction(true);
 	const { id } = useParams();
 	const synthirAccessToken = JSON.parse(
-		localStorage.getItem("synthirAccessToken") || "{}"
+		sessionStorage.getItem("synthirAccessToken") || "{}"
 	);
 	const [syntHIRDischargeLocation, setSyntHIRDischargeLocation] = useState("1");
 	const [syntHIRPatientAgeGroup, setSyntHIRPatientAgeGroup] = useState("2");
-
 	const { client } = useContext(clientContext);
 
 	//patient ID Synthir: 34940 and patient resource ID : 9dbcfce2-2c3a-476a-9b39-eead46d3c725
 	//patient ID OpenDIPS: cdp2010051
+	const dipsSubscriptionKey = process.env.REACT_APP_DIPS_SUBSCRIPTION_KEY || "";
 
 	useEffect(() => {
 		if (client) {
@@ -62,12 +63,16 @@ const Patient: React.FC = () => {
 					.request({
 						url: `/Patient/${id}`,
 						headers: {
-							"dips-subscription-key": "edffd088cc944c8fb50ffd26894aa444",
+							"dips-subscription-key": dipsSubscriptionKey,
 						},
 					})
 					.then((patient) => {
 						setLoading(false);
 						setPatient(patient);
+						onChangePatientPrediction(
+							patient?.gender!,
+							patient?.address![0].postalCode
+						);
 					})
 					.catch((error) => {
 						setLoading(false);
@@ -88,7 +93,7 @@ const Patient: React.FC = () => {
 					.request({
 						url: `/Encounter?patient=${patient?.id}`,
 						headers: {
-							"dips-subscription-key": "edffd088cc944c8fb50ffd26894aa444",
+							"dips-subscription-key": dipsSubscriptionKey,
 						},
 					})
 					.then((encounter) => {
@@ -255,7 +260,13 @@ const Patient: React.FC = () => {
 	};
 
 	const handleSynthirClick = () => {
-		localStorage.setItem("synthirClick", "true");
+		const sessionStorageObj = {
+			synthirClick: true,
+		};
+		sessionStorage.setItem(
+			"synthirClickKey",
+			JSON.stringify(sessionStorageObj)
+		);
 		setTriggerSyntHIR(true);
 	};
 
@@ -285,8 +296,8 @@ const Patient: React.FC = () => {
 			})
 			.then((data) => {
 				console.log(data);
-				//setPrediction(data.prediction);
-				//handleShowPrediction();
+				setPrediction(data.prediction);
+				handleShowPrediction();
 			});
 	};
 
@@ -315,167 +326,208 @@ const Patient: React.FC = () => {
 		return (
 			<>
 				<div className="align-right padding-right">
-					<button className="dipsPrimaryButton" onClick={handleSynthirClick}>
+					<Button
+						className="mb-5"
+						size="lg"
+						onClick={handleSynthirClick}
+						variant="primary"
+					>
 						Populate data from SyntHIR
-					</button>
-					{triggerSyntHIR && <Launch1 />}
+					</Button>
+					{triggerSyntHIR && <LaunchSyntHIR />}
 				</div>
-				<div className="container">
-					<div className="wrapper">
-						<div
-							className="blue-info-card"
-							onClick={() => {
-								onChangePatientPrediction(
-									patient?.gender!,
-									patient?.address![0].postalCode
-								);
-							}}
-						>
-							<div className="text-wrapper">
-								<i className="person-icon"></i>
-								<p className="card-name"></p>
-								<p>
-									Patient ID {" : "}
-									{patient?.identifier![0].value} is a {patient?.gender!}{" "}
-									patient born {patient?.birthDate!} in age group. Born in
-									county {" : "} {patient?.address![0].postalCode}
-								</p>
-							</div>
+				<Container fluid>
+					<div
+						className="patient-details"
+						// onClick={() => {
+						// 	onChangePatientPrediction(
+						// 		patient?.gender!,
+						// 		patient?.address![0].postalCode
+						// 	);
+						// }}
+					>
+						<p>
+							<i className="person-icon"></i>
+							Patient ID {" : "}
+							{patient?.identifier![0].value} is a {patient?.gender!} patient
+						</p>
+						<p>
+							born {patient?.birthDate!} in age group. Born in county {" : "}{" "}
+							{patient?.address![0].postalCode}
+						</p>
+					</div>
+					{encounter && (
+						<div className="width100">
+							<h2 className="mt-5">Hospitalization Details</h2>
+							<SimpleBar>
+								<Row className="pb-5  flex-nowrap">
+									{encounter?.entry?.map((encounterEntry) => {
+										const encounterEntryResource =
+											encounterEntry.resource as IEncounter;
+										return (
+											<Col xs={2} className="me-2">
+												<div
+													key={encounterEntry?.resource?.id}
+													className="blue-info-card"
+													onClick={() => {
+														handleEncounterEvent(encounterEntryResource.id);
+													}}
+												>
+													<div className="text-wrapper">
+														<input
+															type="radio"
+															value={encounterEntryResource.id}
+															name="encounter"
+															data-resourceparam={encounterEntryResource.status}
+															onChange={onChangeEncounterPrediction}
+															onClick={(event) => event.stopPropagation()}
+															checked={
+																encounterRadio === encounterEntry?.resource?.id
+															}
+														/>
+														<p> Status : {encounterEntryResource.status}</p>
+														<p>
+															{" "}
+															Start date :{" "}
+															{encounterEntryResource?.period?.start} and end
+															date : {encounterEntryResource?.period?.end}
+														</p>
+													</div>
+												</div>
+											</Col>
+										);
+									})}
+								</Row>
+							</SimpleBar>
 						</div>
-						{encounter?.entry?.map((encounterEntry) => {
-							const encounterEntryResource =
-								encounterEntry.resource as IEncounter;
-							return (
-								<div
-									key={encounterEntry?.resource?.id}
-									className="blue-info-card"
-									onClick={() => {
-										handleEncounterEvent(encounterEntryResource.id);
-									}}
-								>
-									<div className="text-wrapper">
-										<i className="document-icon"></i>
-										<input
-											type="radio"
-											value={encounterEntryResource.id}
-											name="encounter"
-											data-resourceparam={encounterEntryResource.status}
-											onChange={onChangeEncounterPrediction}
-											onClick={(event) => event.stopPropagation()}
-											checked={encounterRadio === encounterEntry?.resource?.id}
-										/>
-										<p className="card-name">Hospitalization Details</p>
-										<p> Status : {encounterEntryResource.status}</p>
-										<p>
-											{" "}
-											Start date : {encounterEntryResource?.period?.start} and
-											end date : {encounterEntryResource?.period?.end}
-										</p>
-									</div>
-								</div>
-							);
-						})}
-						{condition &&
-							condition?.entry?.map((conditionEntry) => {
-								const conditionEntryResource =
-									conditionEntry.resource as ICondition;
-								return (
-									<div
-										key={conditionEntryResource.id}
-										className="blue-info-card"
-									>
+					)}
+					{condition && (
+						<div className="width100">
+							<h2 className="mt-4">Condition</h2>
+							<SimpleBar>
+								<Row className="pb-5  flex-nowrap">
+									{condition?.entry?.map((conditionEntry) => {
+										const conditionEntryResource =
+											conditionEntry.resource as ICondition;
+										return (
+											<Col xs={2} className="me-3">
+												<div
+													key={conditionEntryResource.id}
+													className="blue-info-card"
+												>
+													<div className="text-wrapper">
+														<input
+															type="radio"
+															value={conditionEntryResource.id}
+															name="condition"
+															data-resourceparam={
+																conditionEntryResource.code?.coding![0].code
+															}
+															onChange={onChangeConditionPrediction}
+															onClick={(event) => event.stopPropagation()}
+															checked={
+																conditionRadio === conditionEntryResource.id
+															}
+														/>
+														<p>
+															Main Diagnosis code {" : "}{" "}
+															{conditionEntryResource.code?.coding![0].code}
+														</p>
+													</div>
+												</div>
+											</Col>
+										);
+									})}
+								</Row>
+							</SimpleBar>
+						</div>
+					)}
+
+					{medicationRequest && (
+						<div className="width100">
+							<h2 className="mt-4">Prescriptions</h2>
+							<SimpleBar>
+								<Row className="pb-5 flex-nowrap">
+									{medicationRequest?.entry?.map((medicationRequestEntry) => {
+										const medicationRequestEntryResource =
+											medicationRequestEntry.resource as IMedicationRequest;
+										return (
+											<Col xs={2} className="me-3">
+												<div
+													key={medicationRequestEntryResource.id}
+													className="blue-info-card"
+													onClick={() => {
+														handleMedicationRequestEvent(
+															medicationRequestEntryResource
+																?.medicationReference?.identifier?.value
+															//medicationRequestEntry.resource.note[1].text
+														);
+													}}
+												>
+													<div className="text-wrapper">
+														<input
+															type="radio"
+															value={medicationRequestEntryResource.id}
+															name="medicationRequest"
+															data-resourceparam={
+																medicationRequestEntryResource?.note?.[1].text
+															}
+															onChange={onChangeMedicationRequestPrediction}
+															onClick={(event) => event.stopPropagation()}
+															checked={
+																medicationRequestRadio ===
+																medicationRequestEntryResource.id
+															}
+														/>
+														<p>
+															Prescription category {" : "}{" "}
+															{medicationRequestEntryResource?.note?.[0].text}
+															with code :{" "}
+															{medicationRequestEntryResource?.note?.[1].text}
+														</p>
+													</div>
+												</div>
+											</Col>
+										);
+									})}
+								</Row>
+							</SimpleBar>
+						</div>
+					)}
+
+					{medication && (
+						<div className="width100">
+							<h2 className="mt-4">Medication</h2>
+							<Row className="pb-5 flex-nowrap">
+								<Col xs={2} className="me-3">
+									<div className="blue-info-card">
 										<div className="text-wrapper">
-											<i className="document-icon"></i>
 											<input
 												type="radio"
-												value={conditionEntryResource.id}
-												name="condition"
-												data-resourceparam={
-													conditionEntryResource.code?.coding![0].code
-												}
-												onChange={onChangeConditionPrediction}
+												value={medication?.id}
+												name="medication"
+												data-resourceparam={medication?.code?.coding![0].code}
+												onChange={onChangeMedicationPrediction}
 												onClick={(event) => event.stopPropagation()}
-												checked={conditionRadio === conditionEntryResource.id}
+												checked={medicationRadio === medication?.id}
 											/>
-											<p className="card-name">Condition</p>
+
 											<p>
-												Main Diagnosis code {" : "}{" "}
-												{conditionEntryResource.code?.coding![0].code}
+												Medication {" : "} {medication?.code?.text} with ICD-10
+												code as {" : "} {medication?.code?.coding![0].code}
 											</p>
 										</div>
 									</div>
-								);
-							})}
-					</div>
-
-					<div className="wrapper">
-						{medicationRequest?.entry?.map((medicationRequestEntry) => {
-							const medicationRequestEntryResource =
-								medicationRequestEntry.resource as IMedicationRequest;
-							return (
-								<div
-									key={medicationRequestEntryResource.id}
-									className="blue-info-card"
-									onClick={() => {
-										handleMedicationRequestEvent(
-											medicationRequestEntryResource?.medicationReference
-												?.identifier?.value
-											//medicationRequestEntry.resource.note[1].text
-										);
-									}}
-								>
-									<div className="text-wrapper">
-										<i className="document-icon"></i>
-										<input
-											type="radio"
-											value={medicationRequestEntryResource.id}
-											name="medicationRequest"
-											data-resourceparam={
-												medicationRequestEntryResource?.note?.[1].text
-											}
-											onChange={onChangeMedicationRequestPrediction}
-											onClick={(event) => event.stopPropagation()}
-											checked={
-												medicationRequestRadio ===
-												medicationRequestEntryResource.id
-											}
-										/>
-										<p className="card-name">Prescriptions</p>
-										<p>
-											Prescription category {" : "}{" "}
-											{medicationRequestEntryResource?.note?.[0].text}
-											with code :{" "}
-											{medicationRequestEntryResource?.note?.[1].text}
-										</p>
-									</div>
-								</div>
-							);
-						})}
-						<div className="blue-info-card">
-							<div className="text-wrapper">
-								<i className="document-icon"></i>
-								<input
-									type="radio"
-									value={medication?.id}
-									name="medication"
-									data-resourceparam={medication?.code?.coding![0].code}
-									onChange={onChangeMedicationPrediction}
-									onClick={(event) => event.stopPropagation()}
-									checked={medicationRadio === medication?.id}
-								/>
-								<p className="card-name">Medication</p>
-								<p>
-									Medication {" : "} {medication?.code?.text} with ICD-10 code
-									as {" : "} {medication?.code?.coding![0].code}
-								</p>
-							</div>
+								</Col>
+							</Row>
 						</div>
-					</div>
-				</div>
+					)}
+				</Container>
 				<div className="text-wrapper dropdown-wrapper">
 					<div>
 						<p>SyntHIR Discharge Location Values</p>
 						<select
+							className="mb-3"
 							value={syntHIRDischargeLocation}
 							onChange={handleChangeSyntHIRDischargeLocation}
 						>
@@ -500,12 +552,18 @@ const Patient: React.FC = () => {
 				</div>
 				<div className="button-wrapper">
 					<div>
-						<button className="dipsPrimaryButton" onClick={fetchPrediction}>
+						<Button
+							className="mb-5"
+							size="lg"
+							onClick={fetchPrediction}
+							variant="primary"
+						>
 							Predict Risk
-						</button>
+						</Button>
 					</div>
 				</div>
-				{/* <Modal
+
+				<Modal
 					show={showPrediction}
 					onHide={handleClosePrediction}
 					backdrop="static"
@@ -514,7 +572,7 @@ const Patient: React.FC = () => {
 					<Modal.Body>
 						The predicted risk of Hospitalization is: {prediction}
 					</Modal.Body>
-				</Modal> */}
+				</Modal>
 			</>
 		);
 	}

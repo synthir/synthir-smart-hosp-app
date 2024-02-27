@@ -1,18 +1,9 @@
 .logo {
-	margin: 40px;
+	margin: 40px 40px 0;
 	height: 120px;
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-image: url("../../public/SyntHIR_logo.PNG"); //put synthir logo file
-}
-
-.github-logo {
-	margin: 40px;
-	height: 60px;
-	width: 60px;
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-image: url("../../public/github-mark.png");
 }
 
 .float-right {
@@ -22,4 +13,10 @@
 
 .mainHeader {
 	display: flex;
+}
+
+.patient-details {
+	position: absolute;
+	right: 20px;
+	top: 20px;
 }

@@ -7,7 +7,7 @@ import "./styles/choosePatient.scss";
 import "./styles/header.scss";
 import "./styles/notfound.scss";
 import Header from "./components/Header";
-import "bootstrap/dist/css/bootstrap.css";
+import "simplebar-react/dist/simplebar.min.css";
 
 const root = ReactDOM.createRoot(
 	document.getElementById("root") as HTMLElement
