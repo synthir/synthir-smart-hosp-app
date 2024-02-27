@@ -319,14 +319,6 @@ const Patient: React.FC = () => {
 		return (
 			<>
 				<div className="align-right padding-right">
-					<Button
-						className="mb-5"
-						size="lg"
-						onClick={handleSynthirClick}
-						variant="primary"
-					>
-						Populate data from SyntHIR
-					</Button>
 					{triggerSyntHIR && <LaunchSyntHIR />}
 				</div>
 				<Container fluid>
@@ -516,33 +508,6 @@ const Patient: React.FC = () => {
 						</div>
 					)}
 				</Container>
-				<div className="text-wrapper dropdown-wrapper">
-					<div>
-						<p>SyntHIR Discharge Location Values</p>
-						<select
-							className="mb-3"
-							value={syntHIRDischargeLocation}
-							onChange={handleChangeSyntHIRDischargeLocation}
-						>
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-						</select>
-					</div>
-					<div>
-						<p>SyntHIR Patient Age Group</p>
-						<select
-							value={syntHIRPatientAgeGroup}
-							onChange={handleChangeSyntHIRPatientAgeGroup}
-						>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-							<option value="5">5</option>
-							<option value="6">6</option>
-						</select>
-					</div>
-				</div>
 				<div className="button-wrapper">
 					<div>
 						<Button

@@ -6,10 +6,12 @@ import { Button } from "react-bootstrap";
 
 const ChoosePatient: React.FC<{
 	clientLoading: boolean;
-	isSyntHIRClicked: IsSyntHIRClickedType;
-}> = ({ clientLoading, isSyntHIRClicked }) => {
+}> = ({ clientLoading }) => {
 	const [patientId, setPatientId] = useState<string>("");
 	const { client, clientSyntHIR } = useContext(clientContext);
+	let isSyntHIRClicked =
+		sessionStorage.getItem("synthirClickKey") != null &&
+		JSON.parse(sessionStorage.getItem("synthirClickKey") || "");
 	const isSynthirWorkflow = isSyntHIRClicked.synthirWorkflow;
 	const currentWorkflowClient = isSynthirWorkflow ? clientSyntHIR : client;
 	const navigate = useNavigate();

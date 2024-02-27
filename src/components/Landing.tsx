@@ -18,6 +18,14 @@ const Landing: React.FC = () => {
 	};
 
 	const handleSyntHIRWithDIPSClick = () => {
+		const sessionStorageObj = {
+			synthirClick: false,
+			synthirWorkflow: false,
+		};
+		sessionStorage.setItem(
+			"synthirClickKey",
+			JSON.stringify(sessionStorageObj)
+		);
 		navigate("/LaunchOpenDIPS");
 	};
 

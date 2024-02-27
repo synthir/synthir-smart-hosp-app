@@ -15,7 +15,7 @@ const App: React.FC = () => {
 	const [client, setClient] = useState<Client>(undefined!);
 	const [clientSyntHIR, setClientSyntHIR] = useState<Client>(undefined!);
 	const [loading, setLoading] = useState<boolean>(false);
-	const isSyntHIRClicked =
+	let isSyntHIRClicked =
 		sessionStorage.getItem("synthirClickKey") != null &&
 		JSON.parse(sessionStorage.getItem("synthirClickKey") || "");
 
@@ -51,7 +51,11 @@ const App: React.FC = () => {
 							"synthirAccessToken",
 							JSON.stringify(clientSyntHIR.state.tokenResponse?.access_token)
 						);
-						sessionStorage.removeItem("synthirClickKey");
+						isSyntHIRClicked = { ...isSyntHIRClicked, synthirClick: false };
+						sessionStorage.setItem(
+							"synthirClickKey",
+							JSON.stringify(isSyntHIRClicked)
+						);
 					};
 					updateClient().then(() => {
 						setLoading(false);
@@ -81,12 +85,7 @@ const App: React.FC = () => {
 						<Route path="/LaunchSyntHIR" element={<LaunchSyntHIR />} />
 						<Route
 							path="/launch"
-							element={
-								<ChoosePatient
-									clientLoading={loading}
-									isSyntHIRClicked={isSyntHIRClicked}
-								/>
-							}
+							element={<ChoosePatient clientLoading={loading} />}
 						/>
 						<Route path="/app" element={<LaunchOpenDIPS />} />
 						<Route path="/patient/:id" element={<SyntHIRCdss />} />
