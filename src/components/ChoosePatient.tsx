@@ -1,7 +1,6 @@
 import { KeyboardEvent, useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import clientContext from "../context/clientContext";
-import { IsSyntHIRClickedType } from "./types";
 import { Button } from "react-bootstrap";
 
 const ChoosePatient: React.FC<{
@@ -28,6 +27,7 @@ const ChoosePatient: React.FC<{
 				? navigate(`/synthirPatient/${currentWorkflowClient.patient.id}`)
 				: navigate(`/patient/${currentWorkflowClient.patient.id}`);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentWorkflowClient, navigate]);
 
 	const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {

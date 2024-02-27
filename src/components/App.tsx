@@ -3,8 +3,8 @@ import clientContext from "../context/clientContext";
 import ChoosePatient from "./ChoosePatient";
 import LaunchOpenDIPS from "./LaunchOpenDIPS";
 import LaunchSyntHIR from "./LaunchSyntHIR";
-import SyntHIRCdss from "./SyntHIRCdss";
-import SyntHIRCdssPatient from "./SyntHIRCdssPatient";
+import CdssWithOpenDIPS from "./CdssWithOpenDIPS";
+import Cdss from "./Cdss";
 import NotFound from "./NotFound";
 import Client from "fhirclient/lib/Client";
 import { useEffect, useState } from "react";
@@ -51,6 +51,7 @@ const App: React.FC = () => {
 							"synthirAccessToken",
 							JSON.stringify(clientSyntHIR.state.tokenResponse?.access_token)
 						);
+						// eslint-disable-next-line react-hooks/exhaustive-deps
 						isSyntHIRClicked = { ...isSyntHIRClicked, synthirClick: false };
 						sessionStorage.setItem(
 							"synthirClickKey",
@@ -88,11 +89,8 @@ const App: React.FC = () => {
 							element={<ChoosePatient clientLoading={loading} />}
 						/>
 						<Route path="/app" element={<LaunchOpenDIPS />} />
-						<Route path="/patient/:id" element={<SyntHIRCdss />} />
-						<Route
-							path="/synthirPatient/:id"
-							element={<SyntHIRCdssPatient />}
-						/>
+						<Route path="/patient/:id" element={<CdssWithOpenDIPS />} />
+						<Route path="/synthirPatient/:id" element={<Cdss />} />
 						<Route path="*" element={<NotFound />} />
 					</Routes>
 				</Router>

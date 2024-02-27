@@ -3,13 +3,13 @@ import { R4 } from "@ahryman40k/ts-fhir-types";
 import { Link, useParams } from "react-router-dom";
 import clientContext from "../context/clientContext";
 import LaunchSyntHIR from "./LaunchSyntHIR";
-import { Container, Button, Row, Col, Modal } from "react-bootstrap";
-import SimpleBar from "simplebar-react";
 import {
 	ICondition,
 	IEncounter,
 	IMedicationRequest,
 } from "@ahryman40k/ts-fhir-types/lib/R4";
+import { Container, Button, Row, Col, Modal } from "react-bootstrap";
+import SimpleBar from "simplebar-react";
 
 const Patient: React.FC = () => {
 	const [patient, setPatient] = useState<R4.IPatient | undefined>();
@@ -24,6 +24,7 @@ const Patient: React.FC = () => {
 	const [medicationRequestRadio, setMedicationRequestRadio] = useState("");
 	const [medicationRadio, setMedicationRadio] = useState("");
 	const [loading, setLoading] = useState<boolean>(false);
+	//const [error, setError] = useState<string | undefined>(undefined);
 	const [triggerSyntHIR, setTriggerSyntHIR] = useState<boolean>(false);
 	const [modelPredictionParams, setModelPredictionParams] = useState<{
 		[key: string]: string | undefined;
@@ -55,36 +56,45 @@ const Patient: React.FC = () => {
 	const dipsSubscriptionKey = process.env.REACT_APP_DIPS_SUBSCRIPTION_KEY || "";
 
 	useEffect(() => {
-		async function fetchPatientFromSyntHIR() {
-			const fetchPatientResourceAPIUrl = `https://synthir-test-fhir-server.azurehealthcareapis.com/Patient/${id}`;
-			await fetch(fetchPatientResourceAPIUrl, {
-				headers: { Authorization: "Bearer " + synthirAccessToken },
-			})
-				.then((response) => {
-					return response.json();
-				})
-				.then((patientSyntHIR) => {
-					setPatient(patientSyntHIR);
-				})
-				.catch((error) => {
-					setLoading(false);
-					//setError(error);
-					//console.error;
-				});
+		if (client) {
+			setLoading(true);
+			async function fetchPatient() {
+				await client
+					.request({
+						url: `/Patient/${id}`,
+						headers: {
+							"dips-subscription-key": dipsSubscriptionKey,
+						},
+					})
+					.then((patient) => {
+						setLoading(false);
+						setPatient(patient);
+						onChangePatientPrediction(
+							patient?.gender!,
+							patient?.address![0].postalCode
+						);
+					})
+					.catch((error) => {
+						setLoading(false);
+						//setError(error);
+						// console.error;
+					});
+			}
+
+			fetchPatient();
 		}
-		fetchPatientFromSyntHIR();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [client]);
 
 	useEffect(() => {
 		if (patient?.id) {
-			async function fetchEncounterRequest() {
-				const fetchEncounterRequestResourceAPIUrl = `https://synthir-test-fhir-server.azurehealthcareapis.com/Encounter?patient=${patient?.id}`;
-				fetch(fetchEncounterRequestResourceAPIUrl, {
-					headers: { Authorization: "Bearer " + synthirAccessToken },
-				})
-					.then((response) => {
-						return response.json();
+			async function fetchEncounter() {
+				await client
+					.request({
+						url: `/Encounter?patient=${patient?.id}`,
+						headers: {
+							"dips-subscription-key": dipsSubscriptionKey,
+						},
 					})
 					.then((encounter) => {
 						setLoading(false);
@@ -96,7 +106,7 @@ const Patient: React.FC = () => {
 						//console.error;
 					});
 			}
-			fetchEncounterRequest();
+			fetchEncounter();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [patient]);
@@ -104,7 +114,8 @@ const Patient: React.FC = () => {
 	useEffect(() => {
 		if (synthirAccessToken != null) {
 			async function fetchMedicationRequest() {
-				const fetchMedicationRequestResourceAPIUrl = `https://synthir-test-fhir-server.azurehealthcareapis.com/MedicationRequest?patient=${id}`;
+				const fetchMedicationRequestResourceAPIUrl =
+					"https://synthir-test-fhir-server.azurehealthcareapis.com/MedicationRequest";
 				fetch(fetchMedicationRequestResourceAPIUrl, {
 					headers: { Authorization: "Bearer " + synthirAccessToken },
 				})
@@ -112,7 +123,6 @@ const Patient: React.FC = () => {
 						return response.json();
 					})
 					.then((medicationRequest) => {
-						setLoading(false);
 						setMedicationRequest(medicationRequest);
 					})
 					.catch((error) => {
@@ -124,7 +134,7 @@ const Patient: React.FC = () => {
 			fetchMedicationRequest();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [patient]);
+	}, []);
 
 	const handleMedicationRequestEvent = (
 		medicationRequestResourecId: string | undefined
@@ -154,27 +164,26 @@ const Patient: React.FC = () => {
 	};
 
 	const handleEncounterEvent = (encounterResourceId: string | undefined) => {
-		if (synthirAccessToken != null) {
-			async function fetchCondition() {
-				const fetchEncounterResourceAPIUrl = `https://synthir-test-fhir-server.azurehealthcareapis.com/Condition?patient=${patient?.id}&encounter=${encounterResourceId}`;
-				fetch(fetchEncounterResourceAPIUrl, {
-					headers: { Authorization: "Bearer " + synthirAccessToken },
+		console.log(encounterResourceId);
+		async function fetchCondition() {
+			await client
+				.request({
+					url: `/Condition?patient=${patient?.id}&encounter=${encounterResourceId}`,
+					headers: {
+						"dips-subscription-key": "edffd088cc944c8fb50ffd26894aa444",
+					},
 				})
-					.then((response) => {
-						return response.json();
-					})
-					.then((condition) => {
-						setLoading(false);
-						setCondition(condition);
-					})
-					.catch((error) => {
-						setLoading(false);
-						//setError(error);
-						//console.error;
-					});
-			}
-			fetchCondition();
+				.then((condition) => {
+					setLoading(false);
+					setCondition(condition);
+				})
+				.catch((error) => {
+					setLoading(false);
+					//setError(error);
+					//console.error;
+				});
 		}
+		fetchCondition();
 	};
 	const onChangePatientPrediction = (
 		patientGender: string,
@@ -251,10 +260,8 @@ const Patient: React.FC = () => {
 	};
 
 	const handleSynthirClick = () => {
-		// sessionStorage.setItem("synthirClick", "true");
 		const sessionStorageObj = {
 			synthirClick: true,
-			synthirWorkflow: true,
 		};
 		sessionStorage.setItem(
 			"synthirClickKey",
@@ -319,17 +326,25 @@ const Patient: React.FC = () => {
 		return (
 			<>
 				<div className="align-right padding-right">
+					<Button
+						className="mb-5"
+						size="lg"
+						onClick={handleSynthirClick}
+						variant="primary"
+					>
+						Populate data from SyntHIR
+					</Button>
 					{triggerSyntHIR && <LaunchSyntHIR />}
 				</div>
 				<Container fluid>
 					<div
 						className="patient-details"
-						onClick={() => {
-							onChangePatientPrediction(
-								patient?.gender!,
-								patient?.address![0].postalCode
-							);
-						}}
+						// onClick={() => {
+						// 	onChangePatientPrediction(
+						// 		patient?.gender!,
+						// 		patient?.address![0].postalCode
+						// 	);
+						// }}
 					>
 						<p>
 							<i className="person-icon"></i>
@@ -343,7 +358,7 @@ const Patient: React.FC = () => {
 					</div>
 					{encounter && (
 						<div className="width100">
-							<h2>Hospitalization Details</h2>
+							<h2 className="mt-5">Hospitalization Details</h2>
 							<SimpleBar>
 								<Row className="pb-5  flex-nowrap">
 									{encounter?.entry?.map((encounterEntry) => {
@@ -508,6 +523,33 @@ const Patient: React.FC = () => {
 						</div>
 					)}
 				</Container>
+				<div className="text-wrapper dropdown-wrapper">
+					<div>
+						<p>SyntHIR Discharge Location Values</p>
+						<select
+							className="mb-3"
+							value={syntHIRDischargeLocation}
+							onChange={handleChangeSyntHIRDischargeLocation}
+						>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+						</select>
+					</div>
+					<div>
+						<p>SyntHIR Patient Age Group</p>
+						<select
+							value={syntHIRPatientAgeGroup}
+							onChange={handleChangeSyntHIRPatientAgeGroup}
+						>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+						</select>
+					</div>
+				</div>
 				<div className="button-wrapper">
 					<div>
 						<Button
