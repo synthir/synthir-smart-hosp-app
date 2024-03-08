@@ -111,8 +111,35 @@ const Patient: React.FC = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [patient]);
 
+	// console.log("cdss", synthirAccessToken);
+	// if (synthirAccessToken != null && synthirAccessToken != "") {
+	// 	async function fetchMedicationRequest() {
+	// 		const fetchMedicationRequestResourceAPIUrl =
+	// 			"https://synthir-test-fhir-server.azurehealthcareapis.com/MedicationRequest";
+	// 		fetch(fetchMedicationRequestResourceAPIUrl, {
+	// 			headers: { Authorization: "Bearer " + synthirAccessToken },
+	// 		})
+	// 			.then((response) => {
+	// 				return response.json();
+	// 			})
+	// 			.then((medicationRequest) => {
+	// 				setMedicationRequest(medicationRequest);
+	// 			})
+	// 			.catch((error) => {
+	// 				setLoading(false);
+	// 				//setError(error);
+	// 				//console.error;
+	// 			});
+	// 	}
+	// 	fetchMedicationRequest();
+	// }
+
 	useEffect(() => {
-		if (synthirAccessToken != null) {
+		if (
+			synthirAccessToken != null &&
+			Object.keys(synthirAccessToken).length != 0
+		) {
+			console.log(Object.keys(synthirAccessToken).length);
 			async function fetchMedicationRequest() {
 				const fetchMedicationRequestResourceAPIUrl =
 					"https://synthir-test-fhir-server.azurehealthcareapis.com/MedicationRequest";
@@ -337,15 +364,7 @@ const Patient: React.FC = () => {
 					{triggerSyntHIR && <LaunchSyntHIR />}
 				</div>
 				<Container fluid>
-					<div
-						className="patient-details"
-						// onClick={() => {
-						// 	onChangePatientPrediction(
-						// 		patient?.gender!,
-						// 		patient?.address![0].postalCode
-						// 	);
-						// }}
-					>
+					<div className="patient-details">
 						<p>
 							<i className="person-icon"></i>
 							Patient ID {" : "}
@@ -460,7 +479,6 @@ const Patient: React.FC = () => {
 														handleMedicationRequestEvent(
 															medicationRequestEntryResource
 																?.medicationReference?.identifier?.value
-															//medicationRequestEntry.resource.note[1].text
 														);
 													}}
 												>
@@ -523,33 +541,35 @@ const Patient: React.FC = () => {
 						</div>
 					)}
 				</Container>
-				<div className="text-wrapper dropdown-wrapper">
-					<div>
-						<p>SyntHIR Discharge Location Values</p>
-						<select
-							className="mb-3"
-							value={syntHIRDischargeLocation}
-							onChange={handleChangeSyntHIRDischargeLocation}
-						>
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-						</select>
+				{medication && (
+					<div className="text-wrapper dropdown-wrapper">
+						<div>
+							<p>SyntHIR Discharge Location Values</p>
+							<select
+								className="mb-3"
+								value={syntHIRDischargeLocation}
+								onChange={handleChangeSyntHIRDischargeLocation}
+							>
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+							</select>
+						</div>
+						<div>
+							<p>SyntHIR Patient Age Group</p>
+							<select
+								value={syntHIRPatientAgeGroup}
+								onChange={handleChangeSyntHIRPatientAgeGroup}
+							>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+							</select>
+						</div>
 					</div>
-					<div>
-						<p>SyntHIR Patient Age Group</p>
-						<select
-							value={syntHIRPatientAgeGroup}
-							onChange={handleChangeSyntHIRPatientAgeGroup}
-						>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-							<option value="5">5</option>
-							<option value="6">6</option>
-						</select>
-					</div>
-				</div>
+				)}
 				<div className="button-wrapper">
 					<div>
 						<Button
