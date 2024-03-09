@@ -471,41 +471,44 @@ const Patient: React.FC = () => {
 										const medicationRequestEntryResource =
 											medicationRequestEntry.resource as IMedicationRequest;
 										return (
-											<Col xs={2} className="me-3">
-												<div
-													key={medicationRequestEntryResource.id}
-													className="blue-info-card"
-													onClick={() => {
-														handleMedicationRequestEvent(
-															medicationRequestEntryResource
-																?.medicationReference?.identifier?.value
-														);
-													}}
-												>
-													<div className="text-wrapper">
-														<input
-															type="radio"
-															value={medicationRequestEntryResource.id}
-															name="medicationRequest"
-															data-resourceparam={
-																medicationRequestEntryResource?.note?.[1].text
-															}
-															onChange={onChangeMedicationRequestPrediction}
-															onClick={(event) => event.stopPropagation()}
-															checked={
-																medicationRequestRadio ===
-																medicationRequestEntryResource.id
-															}
-														/>
-														<p>
-															Prescription category {" : "}{" "}
-															{medicationRequestEntryResource?.note?.[0].text}
-															with code :{" "}
-															{medicationRequestEntryResource?.note?.[1].text}
-														</p>
+											medicationRequestEntryResource?.note?.[0].text !==
+												undefined && (
+												<Col xs={2} className="me-3">
+													<div
+														key={medicationRequestEntryResource.id}
+														className="blue-info-card"
+														onClick={() => {
+															handleMedicationRequestEvent(
+																medicationRequestEntryResource
+																	?.medicationReference?.identifier?.value
+															);
+														}}
+													>
+														<div className="text-wrapper">
+															<input
+																type="radio"
+																value={medicationRequestEntryResource.id}
+																name="medicationRequest"
+																data-resourceparam={
+																	medicationRequestEntryResource?.note?.[1].text
+																}
+																onChange={onChangeMedicationRequestPrediction}
+																onClick={(event) => event.stopPropagation()}
+																checked={
+																	medicationRequestRadio ===
+																	medicationRequestEntryResource.id
+																}
+															/>
+															<p>
+																Prescription category {" : "}{" "}
+																{medicationRequestEntryResource?.note?.[0].text}
+																with code :{" "}
+																{medicationRequestEntryResource?.note?.[1].text}
+															</p>
+														</div>
 													</div>
-												</div>
-											</Col>
+												</Col>
+											)
 										);
 									})}
 								</Row>
