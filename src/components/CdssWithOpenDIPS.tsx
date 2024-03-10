@@ -10,6 +10,15 @@ import {
 } from "@ahryman40k/ts-fhir-types/lib/R4";
 import { Container, Button, Row, Col, Modal } from "react-bootstrap";
 import SimpleBar from "simplebar-react";
+import {
+	BarChart,
+	Bar,
+	XAxis,
+	YAxis,
+	CartesianGrid,
+	Tooltip,
+	Legend,
+} from "recharts";
 
 const Patient: React.FC = () => {
 	const [patient, setPatient] = useState<R4.IPatient | undefined>();
@@ -110,29 +119,6 @@ const Patient: React.FC = () => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [patient]);
-
-	// console.log("cdss", synthirAccessToken);
-	// if (synthirAccessToken != null && synthirAccessToken != "") {
-	// 	async function fetchMedicationRequest() {
-	// 		const fetchMedicationRequestResourceAPIUrl =
-	// 			"https://synthir-test-fhir-server.azurehealthcareapis.com/MedicationRequest";
-	// 		fetch(fetchMedicationRequestResourceAPIUrl, {
-	// 			headers: { Authorization: "Bearer " + synthirAccessToken },
-	// 		})
-	// 			.then((response) => {
-	// 				return response.json();
-	// 			})
-	// 			.then((medicationRequest) => {
-	// 				setMedicationRequest(medicationRequest);
-	// 			})
-	// 			.catch((error) => {
-	// 				setLoading(false);
-	// 				//setError(error);
-	// 				//console.error;
-	// 			});
-	// 	}
-	// 	fetchMedicationRequest();
-	// }
 
 	useEffect(() => {
 		if (
@@ -323,10 +309,19 @@ const Patient: React.FC = () => {
 			})
 			.then((data) => {
 				console.log(data);
-				setPrediction(data.prediction);
+				setPrediction((data.prediction * 100).toFixed(2));
 				handleShowPrediction();
 			});
 	};
+
+	const predictionData = [
+		{
+			name: "Prediction",
+			prediction: prediction,
+		},
+	];
+
+	const predictionColor = Number(prediction) > 50 ? "red" : "green";
 
 	if (loading) {
 		return <></>;
@@ -593,7 +588,23 @@ const Patient: React.FC = () => {
 				>
 					<Modal.Header closeButton></Modal.Header>
 					<Modal.Body>
-						The predicted risk of Hospitalization is: {prediction}
+						<BarChart
+							width={400}
+							height={300}
+							data={predictionData}
+							margin={{
+								top: 5,
+								right: 30,
+								left: 20,
+								bottom: 5,
+							}}
+						>
+							<CartesianGrid strokeDasharray="3 3" />
+							<XAxis dataKey="name" />
+							<YAxis type="number" domain={[0, 100]} />
+							<Bar dataKey="prediction" barSize={20} fill={predictionColor} />
+						</BarChart>
+						The predicted risk of Hospitalization is: {prediction}%
 					</Modal.Body>
 				</Modal>
 			</>
