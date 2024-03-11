@@ -3,6 +3,7 @@ import { R4 } from "@ahryman40k/ts-fhir-types";
 import { Link, useParams } from "react-router-dom";
 import { Container, Button, Row, Col, Modal } from "react-bootstrap";
 import SimpleBar from "simplebar-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import {
 	ICondition,
 	IEncounter,
@@ -257,10 +258,19 @@ const Patient: React.FC = () => {
 			})
 			.then((data) => {
 				console.log(data);
-				setPrediction(data.prediction);
+				setPrediction((data.prediction * 100).toFixed(2));
 				handleShowPrediction();
 			});
 	};
+
+	const predictionData = [
+		{
+			name: "Prediction",
+			prediction: prediction,
+		},
+	];
+
+	const predictionColor = Number(prediction) > 50 ? "red" : "green";
 
 	if (loading) {
 		return <></>;
@@ -492,7 +502,23 @@ const Patient: React.FC = () => {
 				>
 					<Modal.Header closeButton></Modal.Header>
 					<Modal.Body>
-						The predicted risk of Hospitalization is: {prediction}
+						<BarChart
+							width={400}
+							height={300}
+							data={predictionData}
+							margin={{
+								top: 5,
+								right: 30,
+								left: 20,
+								bottom: 5,
+							}}
+						>
+							<CartesianGrid strokeDasharray="3 3" />
+							<XAxis dataKey="name" />
+							<YAxis type="number" domain={[0, 100]} />
+							<Bar dataKey="prediction" barSize={20} fill={predictionColor} />
+						</BarChart>
+						The predicted risk of Hospitalization is: {prediction}%
 					</Modal.Body>
 				</Modal>
 			</>
