@@ -10,15 +10,7 @@ import {
 } from "@ahryman40k/ts-fhir-types/lib/R4";
 import { Container, Button, Row, Col, Modal } from "react-bootstrap";
 import SimpleBar from "simplebar-react";
-import {
-	BarChart,
-	Bar,
-	XAxis,
-	YAxis,
-	CartesianGrid,
-	Tooltip,
-	Legend,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 
 const Patient: React.FC = () => {
 	const [patient, setPatient] = useState<R4.IPatient | undefined>();
@@ -123,7 +115,7 @@ const Patient: React.FC = () => {
 	useEffect(() => {
 		if (
 			synthirAccessToken != null &&
-			Object.keys(synthirAccessToken).length != 0
+			Object.keys(synthirAccessToken).length !== 0
 		) {
 			console.log(Object.keys(synthirAccessToken).length);
 			async function fetchMedicationRequest() {
