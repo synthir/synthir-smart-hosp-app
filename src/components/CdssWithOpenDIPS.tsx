@@ -10,6 +10,15 @@ import {
 } from "@ahryman40k/ts-fhir-types/lib/R4";
 import { Container, Button, Row, Col, Modal } from "react-bootstrap";
 import SimpleBar from "simplebar-react";
+import {
+	BarChart,
+	Bar,
+	XAxis,
+	YAxis,
+	CartesianGrid,
+	Tooltip,
+	Legend,
+} from "recharts";
 
 const Patient: React.FC = () => {
 	const [patient, setPatient] = useState<R4.IPatient | undefined>();
@@ -112,7 +121,11 @@ const Patient: React.FC = () => {
 	}, [patient]);
 
 	useEffect(() => {
-		if (synthirAccessToken != null) {
+		if (
+			synthirAccessToken != null &&
+			Object.keys(synthirAccessToken).length != 0
+		) {
+			console.log(Object.keys(synthirAccessToken).length);
 			async function fetchMedicationRequest() {
 				const fetchMedicationRequestResourceAPIUrl =
 					"https://synthir-test-fhir-server.azurehealthcareapis.com/MedicationRequest";
@@ -296,10 +309,19 @@ const Patient: React.FC = () => {
 			})
 			.then((data) => {
 				console.log(data);
-				setPrediction(data.prediction);
+				setPrediction((data.prediction * 100).toFixed(2));
 				handleShowPrediction();
 			});
 	};
+
+	const predictionData = [
+		{
+			name: "Prediction",
+			prediction: prediction,
+		},
+	];
+
+	const predictionColor = Number(prediction) > 50 ? "red" : "green";
 
 	if (loading) {
 		return <></>;
@@ -337,15 +359,7 @@ const Patient: React.FC = () => {
 					{triggerSyntHIR && <LaunchSyntHIR />}
 				</div>
 				<Container fluid>
-					<div
-						className="patient-details"
-						// onClick={() => {
-						// 	onChangePatientPrediction(
-						// 		patient?.gender!,
-						// 		patient?.address![0].postalCode
-						// 	);
-						// }}
-					>
+					<div className="patient-details">
 						<p>
 							<i className="person-icon"></i>
 							Patient ID {" : "}
@@ -452,42 +466,44 @@ const Patient: React.FC = () => {
 										const medicationRequestEntryResource =
 											medicationRequestEntry.resource as IMedicationRequest;
 										return (
-											<Col xs={2} className="me-3">
-												<div
-													key={medicationRequestEntryResource.id}
-													className="blue-info-card"
-													onClick={() => {
-														handleMedicationRequestEvent(
-															medicationRequestEntryResource
-																?.medicationReference?.identifier?.value
-															//medicationRequestEntry.resource.note[1].text
-														);
-													}}
-												>
-													<div className="text-wrapper">
-														<input
-															type="radio"
-															value={medicationRequestEntryResource.id}
-															name="medicationRequest"
-															data-resourceparam={
-																medicationRequestEntryResource?.note?.[1].text
-															}
-															onChange={onChangeMedicationRequestPrediction}
-															onClick={(event) => event.stopPropagation()}
-															checked={
-																medicationRequestRadio ===
-																medicationRequestEntryResource.id
-															}
-														/>
-														<p>
-															Prescription category {" : "}{" "}
-															{medicationRequestEntryResource?.note?.[0].text}
-															with code :{" "}
-															{medicationRequestEntryResource?.note?.[1].text}
-														</p>
+											medicationRequestEntryResource?.note?.[0].text !==
+												undefined && (
+												<Col xs={2} className="me-3">
+													<div
+														key={medicationRequestEntryResource.id}
+														className="blue-info-card"
+														onClick={() => {
+															handleMedicationRequestEvent(
+																medicationRequestEntryResource
+																	?.medicationReference?.identifier?.value
+															);
+														}}
+													>
+														<div className="text-wrapper">
+															<input
+																type="radio"
+																value={medicationRequestEntryResource.id}
+																name="medicationRequest"
+																data-resourceparam={
+																	medicationRequestEntryResource?.note?.[1].text
+																}
+																onChange={onChangeMedicationRequestPrediction}
+																onClick={(event) => event.stopPropagation()}
+																checked={
+																	medicationRequestRadio ===
+																	medicationRequestEntryResource.id
+																}
+															/>
+															<p>
+																Prescription category {" : "}{" "}
+																{medicationRequestEntryResource?.note?.[0].text}
+																with code :{" "}
+																{medicationRequestEntryResource?.note?.[1].text}
+															</p>
+														</div>
 													</div>
-												</div>
-											</Col>
+												</Col>
+											)
 										);
 									})}
 								</Row>
@@ -523,33 +539,35 @@ const Patient: React.FC = () => {
 						</div>
 					)}
 				</Container>
-				<div className="text-wrapper dropdown-wrapper">
-					<div>
-						<p>SyntHIR Discharge Location Values</p>
-						<select
-							className="mb-3"
-							value={syntHIRDischargeLocation}
-							onChange={handleChangeSyntHIRDischargeLocation}
-						>
-							<option value="1">1</option>
-							<option value="2">2</option>
-							<option value="3">3</option>
-						</select>
+				{medication && (
+					<div className="text-wrapper dropdown-wrapper">
+						<div>
+							<p>SyntHIR Discharge Location Values</p>
+							<select
+								className="mb-3"
+								value={syntHIRDischargeLocation}
+								onChange={handleChangeSyntHIRDischargeLocation}
+							>
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+							</select>
+						</div>
+						<div>
+							<p>SyntHIR Patient Age Group</p>
+							<select
+								value={syntHIRPatientAgeGroup}
+								onChange={handleChangeSyntHIRPatientAgeGroup}
+							>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+							</select>
+						</div>
 					</div>
-					<div>
-						<p>SyntHIR Patient Age Group</p>
-						<select
-							value={syntHIRPatientAgeGroup}
-							onChange={handleChangeSyntHIRPatientAgeGroup}
-						>
-							<option value="2">2</option>
-							<option value="3">3</option>
-							<option value="4">4</option>
-							<option value="5">5</option>
-							<option value="6">6</option>
-						</select>
-					</div>
-				</div>
+				)}
 				<div className="button-wrapper">
 					<div>
 						<Button
@@ -570,7 +588,23 @@ const Patient: React.FC = () => {
 				>
 					<Modal.Header closeButton></Modal.Header>
 					<Modal.Body>
-						The predicted risk of Hospitalization is: {prediction}
+						<BarChart
+							width={400}
+							height={300}
+							data={predictionData}
+							margin={{
+								top: 5,
+								right: 30,
+								left: 20,
+								bottom: 5,
+							}}
+						>
+							<CartesianGrid strokeDasharray="3 3" />
+							<XAxis dataKey="name" />
+							<YAxis type="number" domain={[0, 100]} />
+							<Bar dataKey="prediction" barSize={20} fill={predictionColor} />
+						</BarChart>
+						The predicted risk of Hospitalization is: {prediction}%
 					</Modal.Body>
 				</Modal>
 			</>
