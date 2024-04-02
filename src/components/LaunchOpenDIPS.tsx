@@ -3,6 +3,9 @@ import { useSearchParams } from "react-router-dom";
 
 const LaunchOpenDIPS: React.FC = () => {
 	const [searchParams] = useSearchParams();
+	const dipsClientID = process.env.DIPS_CLIENT_ID || "";
+
+	const dipsClientSecret = process.env.DIPS_CLIENT_SECRET || "";
 
 	// Let user specify issuer (iss) in query param
 	let iss = searchParams.get("iss");
@@ -23,8 +26,8 @@ const LaunchOpenDIPS: React.FC = () => {
 		FHIR.oauth2.authorize({
 			iss: "https://api.dips.no/fhir",
 			redirectUri: "/launch",
-			client_id: "pavitra-uit",
-			clientSecret: "2HG_Lr!8eQxmDTF",
+			client_id: dipsClientID,
+			clientSecret: dipsClientSecret,
 			scope: "openid dips-fhir-r4 fhirUser patient/*.read offline_access",
 			launch: launch,
 		});

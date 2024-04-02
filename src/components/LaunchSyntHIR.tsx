@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 const LaunchSyntHIR: React.FC = () => {
 	const [searchParams] = useSearchParams();
+	const synthirClientID = process.env.SYNTHIR_CLIENT_ID || "";
 
 	const isSyntHIRClicked =
 		sessionStorage.getItem("synthirClickKey") != null &&
@@ -24,7 +25,7 @@ const LaunchSyntHIR: React.FC = () => {
 	FHIR.oauth2.authorize({
 		iss: iss,
 		redirectUri: redirectURI,
-		client_id: "2a8f1f87-9cce-40d5-8015-1548529965ad",
+		client_id: synthirClientID,
 		scope:
 			"https://synthir-test-fhir-server.azurehealthcareapis.com/user_impersonation",
 		launch: launch,
