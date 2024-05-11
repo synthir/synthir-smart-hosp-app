@@ -3,9 +3,9 @@ import { useSearchParams } from "react-router-dom";
 
 const LaunchOpenDIPS: React.FC = () => {
 	const [searchParams] = useSearchParams();
-	const dipsClientID = process.env.DIPS_CLIENT_ID || "";
+	const dipsClientID = process.env.REACT_APP_DIPS_CLIENT_ID || "";
 
-	const dipsClientSecret = process.env.DIPS_CLIENT_SECRET || "";
+	const dipsClientSecret = process.env.REACT_APP_DIPS_CLIENT_SECRET || "";
 
 	// Let user specify issuer (iss) in query param
 	let iss = searchParams.get("iss");

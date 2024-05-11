@@ -318,7 +318,11 @@ const Patient: React.FC = () => {
 										const encounterEntryResource =
 											encounterEntry.resource as IEncounter;
 										return (
-											<Col xs={2} className="me-2">
+											<Col
+												xs={2}
+												className="me-2"
+												key={encounterEntry?.resource?.id}
+											>
 												<div
 													key={encounterEntry?.resource?.id}
 													className="blue-info-card"
@@ -367,7 +371,11 @@ const Patient: React.FC = () => {
 										const conditionEntryResource =
 											conditionEntry.resource as ICondition;
 										return (
-											<Col xs={2} className="me-3">
+											<Col
+												xs={2}
+												className="me-3"
+												key={conditionEntryResource.id}
+											>
 												<div
 													key={conditionEntryResource.id}
 													className="blue-info-card"
@@ -411,7 +419,11 @@ const Patient: React.FC = () => {
 										return (
 											medicationRequestEntryResource?.note?.[0].text !==
 												undefined && (
-												<Col xs={2} className="me-3">
+												<Col
+													xs={2}
+													className="me-3"
+													key={medicationRequestEntryResource.id}
+												>
 													<div
 														key={medicationRequestEntryResource.id}
 														className="blue-info-card"

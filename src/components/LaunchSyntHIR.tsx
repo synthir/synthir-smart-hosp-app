@@ -3,8 +3,9 @@ import { useSearchParams } from "react-router-dom";
 
 const LaunchSyntHIR: React.FC = () => {
 	const [searchParams] = useSearchParams();
-	const synthirClientID = process.env.SYNTHIR_CLIENT_ID || "";
-
+	const synthirClientID = process.env.REACT_APP_SYNTHIR_CLIENT_ID || "";
+	const synthirClientScope = process.env.REACT_APP_SYNTHIR_CLIENT_SCOPE || "";
+	console.log(synthirClientID, synthirClientScope);
 	const isSyntHIRClicked =
 		sessionStorage.getItem("synthirClickKey") != null &&
 		JSON.parse(sessionStorage.getItem("synthirClickKey") || "");
@@ -26,8 +27,7 @@ const LaunchSyntHIR: React.FC = () => {
 		iss: iss,
 		redirectUri: redirectURI,
 		client_id: synthirClientID,
-		scope:
-			"https://synthir-test-fhir-server.azurehealthcareapis.com/user_impersonation",
+		scope: synthirClientScope,
 		launch: launch,
 		pkceMode: "unsafeV1",
 	});
