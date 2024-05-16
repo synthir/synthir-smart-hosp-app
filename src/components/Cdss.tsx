@@ -257,7 +257,7 @@ const Patient: React.FC = () => {
 				return response.json();
 			})
 			.then((data) => {
-				console.log(data);
+				console.log("prediction:", data);
 				setPrediction((data.prediction * 100).toFixed(2));
 				handleShowPrediction();
 			});
