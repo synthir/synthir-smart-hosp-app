@@ -17,4 +17,4 @@ To run the app on your local machine, Clone the repo and then build and run the 
 3. npm install
 4. npm start
 
-The app is also deployed on a cloud and accessed using the URL : https://synthirsmartapphospprediction.azurewebsites.net/
+The app is also deployed on a cloud and can be accessed using the URL : https://synthirsmartapphospprediction.azurewebsites.net/
