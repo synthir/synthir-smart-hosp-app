@@ -42,9 +42,11 @@ const ChoosePatient: React.FC<{
 				<div className="inputDialog">
 					<div className="inputField">
 						<label className="inputLabel">
-							Search for a patient ID or SSN <br />
+							Search for a patient ID
+							<br />
 							<span>
-								(eg. cdp2010051 or 9dbcfce2-2c3a-476a-9b39-eead46d3c725)
+								(cdp2014109 for Open DIPS or
+								9dbcfce2-2c3a-476a-9b39-eead46d3c725 for SyntHIR)
 							</span>
 						</label>
 						<input

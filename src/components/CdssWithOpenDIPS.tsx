@@ -179,6 +179,7 @@ const Patient: React.FC = () => {
 					},
 				})
 				.then((condition) => {
+					console.log(condition);
 					setLoading(false);
 					setCondition(condition);
 				})
