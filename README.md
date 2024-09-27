@@ -35,7 +35,7 @@ Username : synthiruser@outlook.com
 Password : Synthirtestuser
 ```
 
-2.  It will authenticate with SyntHIR server and land on the search patient page. Search Patient using the patient ID 9dbcfce2-2c3a-476a-9b39-eead46d3c725.
+2.  It will authenticate with SyntHIR server and land on the search patient page. Search Patient using the patient ID _9dbcfce2-2c3a-476a-9b39-eead46d3c725_.
 3.  It will fetch hospitalization and prescriptions for that patient ID. If you click on the hospitalization box, it will fetch corresponding conditions. Similarly, clicking on prescription box, will fetch medication code for that prescription.
 4.  To get the risk of hospitalization, select hospitalization, condition, prescription and medication by clicking on the radio button of the respective boxes and then click on 'Predict' button.
 
@@ -48,7 +48,7 @@ Username: OPENDIPS
 Password: OPEN DIPS
 ```
 
-2.  It will first authenticate with Open DIPS server and land on the search patient page. Search Patient using the patient ID cdp2014109.
+2.  It will first authenticate with Open DIPS server and land on the search patient page. Search Patient using the patient ID _cdp2014109_.
 3.  It will fetch hospitalization for that patient ID. If you click on the hospitalization box, it will fetch corresponding conditions. To fetch prescriptions and medication related information, click on button 'Populate with SyntHIR' and enter the above mentioned user credentials for SyntHIR.
-4.  Once authenticated with SyntHIR server, it will again land on search patient page. Enter the patient ID cdp2014109. It will fetch hospitalizations from Open DIPS and prescriptions from SyntHIR server. When you Click on prescription box, will fetch medication code for that prescription.
+4.  Once authenticated with SyntHIR server, it will again land on search patient page. Enter the patient ID _cdp2014109_. It will fetch hospitalizations from Open DIPS and prescriptions from SyntHIR server. When you Click on prescription box, will fetch medication code for that prescription.
 5.  To get the risk of hospitalization, select hospitalization, condition, prescription and medication by clicking on the radio button of the respective boxes and then click on Predict button
