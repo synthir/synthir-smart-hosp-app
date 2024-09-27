@@ -27,6 +27,7 @@
 		"recharts": "^2.12.2",
 		"sass": "^1.60.0",
 		"simplebar-react": "^3.2.4",
+		"synthir-smartapp-hosp-prediction": "file:",
 		"typescript": "^4.9.5",
 		"web-vitals": "^3.1.1"
 	},
