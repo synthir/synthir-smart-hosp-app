@@ -1,5 +1,5 @@
 <h2 align="center">
-  <img src="https://github.com/pavitra-singh/SyntHIR-SMART-app/blob/development/public/SyntHIR_logo.PNG" height="150px">
+  <img src="README_images/SyntHIR_logo.PNG" height="150px">
 </h2>
 
 <h4 align="center">
@@ -9,6 +9,39 @@
 ## CDSS tool predicting risk of hospitalization
 
 This tool is developed using SMART on FHIR framework, which utilizes a machine learning model for prediction. The machine learning model is hosted on a cloud and the code for the model can be found here: https://github.com/synthir/synthir-smart-model
+
+## Getting Started
+
+If you want to just run the CDSS tool (SMART on FHIR app), should follow the [Run the app using Docker image](#run-the-app-using-docker-image) instructions instead, and to examine or extend the source code, follow [Developer Start Guide](#developer-start-guide) instructions.
+
+### [Run the app using Docker image](#run-the-app-using-docker-image)
+
+The docker image of the app is uploaded on the DockerHub, and docker file is also available in the root directory of the project source code (named as Dockerfile), which needs to be build into a image. The docker image can run on the local machine or on 'play with docker' (https://www.docker.com/play-with-docker/).
+
+To run the dockerfile on the local machine, install docker desktop on windows, linux or mac using the link : https://docs.docker.com/get-docker/. Pull the docker image from docker hub and run it OR Use the dockerfile available in the source code.
+
+To use the docker image from docker hub, pull and run:
+
+```
+docker pull synthir21/smartapp:latest
+docker run -p 8080:80 synthir21/smartapp:latest
+```
+
+To use the dockerfile available in the source code, first clone the repository:
+
+```
+git clone https://github.com/synthir/synthir-smart-hosp-app.git
+cd synthir-smart-hosp-app
+```
+
+Now, build docker image from the dockerfile and run:
+
+```
+docker build --tag 'smartapp:latest' .
+docker run -p 8080:80 synthir21/smartapp:latest
+```
+
+Argument --tag indicates the repository name for the image (smartapp) and tag is latest; 80 is the port number on which the application is running in the container and 8080 is the port number mapped to 80 port of the container.
 
 ### [Developer Start Guide](#developer-start-guide)
 
