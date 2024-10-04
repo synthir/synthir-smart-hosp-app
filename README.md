@@ -81,7 +81,7 @@ Username: OPENDIPS
 Password: OPEN DIPS
 ```
 
-2.  It will first authenticate with Open DIPS server and land on the search patient page. Search Patient using the patient ID _cdp2014109_.
+2.  It will first authenticate with Open DIPS server and land on the search patient page. Search Patient using the patient ID _cdp2011921_.
 3.  It will fetch hospitalization for that patient ID. If you click on the hospitalization box, it will fetch corresponding conditions. To fetch prescriptions and medication related information, click on button 'Populate with SyntHIR' and enter the above mentioned user credentials for SyntHIR.
-4.  Once authenticated with SyntHIR server, it will again land on search patient page. Enter the patient ID _cdp2014109_. It will fetch hospitalizations from Open DIPS and prescriptions from SyntHIR server. When you Click on prescription box, will fetch medication code for that prescription.
+4.  Once authenticated with SyntHIR server, it will again land on search patient page. Enter the patient ID _cdp2011921_. It will fetch hospitalizations from Open DIPS and prescriptions from SyntHIR server. When you Click on prescription box, will fetch medication code for that prescription.
 5.  To get the risk of hospitalization, select hospitalization, condition, prescription and medication by clicking on the radio button of the respective boxes and then click on Predict button

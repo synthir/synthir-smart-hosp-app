@@ -45,8 +45,8 @@ const ChoosePatient: React.FC<{
 							Search for a patient ID
 							<br />
 							<span>
-								(cdp2014109 for Open DIPS or
-								9dbcfce2-2c3a-476a-9b39-eead46d3c725 for SyntHIR)
+								(Test Patient ID for Open DIPS and SyntHIR synthetic FHIR server
+								is given in GitHub)
 							</span>
 						</label>
 						<input
